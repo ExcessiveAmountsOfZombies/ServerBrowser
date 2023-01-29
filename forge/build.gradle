@@ -1,0 +1,180 @@
+buildscript {
+    repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url= 'https://repo.spongepowered.org/repository/maven-public/' }
+        maven { url = 'https://maven.parchmentmc.org' }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1+', changing: true
+        classpath 'gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0'
+        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
+    }
+}
+
+plugins {
+    id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+}
+
+apply plugin: 'org.spongepowered.mixin'
+
+version = project.modVersion
+group = project.mavenGroup
+archivesBaseName = modBaseArchiveName + "-" + minecraftVersion + "-FORGE"
+
+repositories {
+
+}
+
+configurations {
+    shade
+    compileOnly.extendsFrom shade
+    compileOnly.extendsFrom shadeSource
+}
+
+mixin {
+    // put mixin sets in here
+    // and configs
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs += [
+                    "src/main/generated",
+                    rootProject.sourceSets.main.resources
+            ]
+        }
+    }
+}
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+minecraft {
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    mappings channel: 'parchment', version: "${project.parchmentVersion}-${project.minecraftVersion}"
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'legacyClassPath', '{minecraft_classpath}'
+            arg "-mixin.config=bozoiD.mixins.json"
+            // Recommended logging data for a userdev environment
+            //property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            // Recommended logging level for the console //property 'forge.logging.console.level', 'debug'
+            args '--mod', 'bozoiD', '--all', '--output', file('src/generated/resources/'), '--existing', rootProject.file('src/main/resources/')
+            mods {
+                bozoiD {
+                    sources(sourceSets.main, rootProject.sourceSets.main)
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                bozoiD {
+                    sources(sourceSets.main, rootProject.sourceSets.main)
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file('run')
+            property 'legacyClassPath', '{minecraft_classpath}'
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+            args '--mod', 'bozoiD', '--all', '--output', file('src/generated/resources/'), '--existing', rootProject.file('src/main/resources/')
+            mods {
+                bozoiD {
+                    sources(sourceSets.main, rootProject.sourceSets.main)
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraftVersion}-${forgeVersion}"
+    implementation(rootProject)
+    shade(rootProject)
+    annotationProcessor "org.spongepowered:mixin:${mixinVersion}:processor"
+}
+
+shadowJar {
+    archiveClassifier = ""
+    enabled = true
+    configurations = [project.configurations.shade]
+}
+
+artifacts {
+    archives shadowJar
+    shadow shadowJar
+}
+
+jar {
+    manifest {
+        attributes([
+                "Specification-Title": "idbozoiD",
+                "Specification-Vendor": "epherical.com",
+                "Specification-Version": "1",
+                "Implementation-Title": "${modBaseArchiveName}",
+                "Implementation-Version": "${modVersion}",
+                "Implementation-Vendor" :"epherical.com",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                "MixinConfigs": "bozoiD.mixins.json"
+        ])
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+    source(rootProject.sourceSets.main.allSource)
+}
+
+tasks.processResources.dependsOn(rootProject.tasks.processResources)
+tasks.build.dependsOn(tasks.shadowJar)
+
+reobf {
+    shadowJar {}
+}
+
+jar.finalizedBy('reobfJar')
+
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+// configure the maven publication
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "${modBaseArchiveName}-" + artifactId
+            version = version + "-${minecraftVersion}"
+            // add all the jars that should be included when publishing to maven
+            from components.java
+
+            artifact sourceJar
+        }
+    }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+        // Notice: This block does NOT have the same function as the block in the top level.
+        // The repositories here will be used for publishing your artifact, not for
+        // retrieving dependencies.
+    }
+}
