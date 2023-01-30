@@ -7,6 +7,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerStatusPinger;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,14 +20,17 @@ public class ServerBrowserScreen extends Screen {
     private final ServerStatusPinger pinger = new ServerStatusPinger();
     protected ServerBrowserList list;
 
-    private Button selectButton;
-    private Button editButton;
+    private Button joinButton;
+    private Button favoriteButton;
 
     @Nullable
     private List<Component> toolTip;
 
-    public ServerBrowserScreen() {
+    private Screen previousScreen;
+
+    public ServerBrowserScreen(Screen previousScreen) {
         super(Component.nullToEmpty(""));
+        this.previousScreen = previousScreen;
     }
 
 
@@ -35,11 +39,11 @@ public class ServerBrowserScreen extends Screen {
         list = new ServerBrowserList(this, this.minecraft, this.width, this.height, 32, this.height - 64, 36);
         list.queryServers();
 
-        this.selectButton = this.addRenderableWidget(Button.builder(Component.translatable("selectServer.select"), (button) -> {
+        this.joinButton = this.addRenderableWidget(Button.builder(Component.translatable("selectServer.select"), (button) -> {
             /*this.joinSelectedServer();*/
         }).bounds(this.width / 2 - 154, this.height - 52, 100, 20).build());
-        this.selectButton.active = false;
-        this.editButton = this.addRenderableWidget(Button.builder(Component.translatable("Favorite"), (button) -> {
+        this.joinButton.active = false;
+        this.favoriteButton = this.addRenderableWidget(Button.builder(Component.translatable("Favorite"), (button) -> {
            /* ServerSelectionList.Entry entry = (ServerSelectionList.Entry)this.serverSelectionList.getSelected();
             if (entry instanceof ServerSelectionList.OnlineServerEntry) {
                 ServerData serverData = ((ServerSelectionList.OnlineServerEntry)entry).getServerData();
@@ -48,10 +52,13 @@ public class ServerBrowserScreen extends Screen {
                 this.minecraft.setScreen(new EditServerScreen(this, this::editServerCallback, this.editingServer));
             }*/
         }).bounds(this.width / 2 - 154, this.height - 28, 70, 20).build());
-        this.editButton.active = false;
+        this.favoriteButton.active = false;
         this.addRenderableWidget(Button.builder(Component.translatable("selectServer.refresh"), (button) -> {
             this.refreshServerList();
-        }).bounds(this.width / 2 - 80, this.height - 28, 150, 20).build());
+        }).bounds(this.width / 2 - 80, this.height - 28, 156, 20).build());
+        this.addRenderableWidget(Button.builder(CommonComponents.GUI_CANCEL, (button) -> {
+            this.minecraft.setScreen(this.previousScreen);
+        }).bounds(this.width / 2 + 4 + 76, this.height - 28, 75, 20).build());
 
         this.addWidget(list);
     }
@@ -69,7 +76,7 @@ public class ServerBrowserScreen extends Screen {
     }
 
     private void refreshServerList() {
-        this.minecraft.setScreen(new ServerBrowserScreen());
+        this.minecraft.setScreen(new ServerBrowserScreen(this.previousScreen));
     }
 
     public ServerStatusPinger getPinger() {

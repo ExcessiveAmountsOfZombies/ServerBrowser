@@ -177,38 +177,33 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             List<FormattedCharSequence> list = this.minecraft.font.split(this.serverData.motd, width - 32 - 2);
 
             for (int i = 0; i < Math.min(list.size(), 2); ++i) {
-                Font var10000 = this.minecraft.font;
-                FormattedCharSequence var10002 = list.get(i);
-                float var10003 = (float) (left + 32 + 3);
-                int var10004 = top + 12;
-                Objects.requireNonNull(this.minecraft.font);
-                var10000.draw(poseStack, var10002, var10003, (float) (var10004 + 9 * i), 8421504);
+                this.minecraft.font.draw(poseStack, list.get(i), (left + 32 + 3), (float) (top + 12 + 9 * i), 8421504);
             }
 
             Component component = bl ? this.serverData.version.copy().withStyle(ChatFormatting.RED) : this.serverData.status;
-            int j = this.minecraft.font.width(component);
-            this.minecraft.font.draw(poseStack, component, (float) (left + width - j - 15 - 2), (float) (top + 1), 8421504);
+            int textWidth = this.minecraft.font.width(component);
+            this.minecraft.font.draw(poseStack, component, (float) (left + width - textWidth - 15 - 2), (float) (top + 1), 8421504);
             int k = 0;
-            int l;
+            int latency;
             List<Component> list2;
             Component component2;
             if (bl) {
-                l = 5;
+                latency = 5;
                 component2 = INCOMPATIBLE_TOOLTIP;
                 list2 = this.serverData.playerList;
             } else if (this.serverData.pinged && this.serverData.ping != -2L) {
                 if (this.serverData.ping < 0L) {
-                    l = 5;
+                    latency = 5;
                 } else if (this.serverData.ping < 150L) {
-                    l = 0;
+                    latency = 0;
                 } else if (this.serverData.ping < 300L) {
-                    l = 1;
+                    latency = 1;
                 } else if (this.serverData.ping < 600L) {
-                    l = 2;
+                    latency = 2;
                 } else if (this.serverData.ping < 1000L) {
-                    l = 3;
+                    latency = 3;
                 } else {
-                    l = 4;
+                    latency = 4;
                 }
 
                 if (this.serverData.ping < 0L) {
@@ -220,9 +215,9 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
                 }
             } else {
                 k = 1;
-                l = (int) (Util.getMillis() / 100L + (long) (index * 2) & 7L);
-                if (l > 4) {
-                    l = 8 - l;
+                latency = (int) (Util.getMillis() / 100L + (index * 2L) & 7L);
+                if (latency > 4) {
+                    latency = 8 - latency;
                 }
 
                 component2 = PINGING_TOOLTIP;
@@ -232,7 +227,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.setShaderTexture(0, GuiComponent.GUI_ICONS_LOCATION);
-            GuiComponent.blit(poseStack, left + width - 15, top, (float) (k * 10), (float) (176 + l * 8), 10, 8, 256, 256);
+            GuiComponent.blit(poseStack, left + width - 15, top, (float) (k * 10), (float) (176 + latency * 8), 10, 8, 256, 256);
             String string = this.serverData.getIconB64();
             if (!Objects.equals(string, this.lastIconB64)) {
                 if (this.uploadServerIcon(string)) {
@@ -251,11 +246,6 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
 
             int m = mouseX - left;
             int n = mouseY - top;
-            if (m >= width - 15 && m <= width - 5 && n >= 0 && n <= 8) {
-                this.screen.setToolTip(Collections.singletonList(component2));
-            } else if (m >= width - j - 15 - 2 && m <= width - 15 - 2 && n >= 0 && n <= 8) {
-                this.screen.setToolTip(list2);
-            }
 
             if (this.minecraft.options.touchscreen().get() || isMouseOver) {
                 RenderSystem.setShaderTexture(0, ICON_OVERLAY_LOCATION);
@@ -265,13 +255,11 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
                 int o = mouseX - left;
                 int p = mouseY - top;
                 if (this.canJoin()) {
+                    List<Component> components = tags.stream().map(Component::literal).collect(Collectors.toList());
+                    screen.setToolTip(components);
                     if (o < 32 && o > 16) {
-                        List<Component> components = tags.stream().map(Component::literal).collect(Collectors.toList());
-                        screen.setToolTip(components);
                         GuiComponent.blit(poseStack, left, top, 0.0F, 32.0F, 32, 32, 256, 256);
                     } else {
-                        List<Component> components = tags.stream().map(Component::literal).collect(Collectors.toList());
-                        screen.setToolTip(components);
                         GuiComponent.blit(poseStack, left, top, 0.0F, 0.0F, 32, 32, 256, 256);
                     }
                 }
@@ -292,6 +280,13 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
                     }
                 }*/
             }
+
+            if (m >= width - 15 && m <= width - 5 && n >= 0 && n <= 8) {
+                this.screen.setToolTip(Collections.singletonList(component2));
+            } else if (m >= width - textWidth - 15 - 2 && m <= width - 15 - 2 && n >= 0 && n <= 8) {
+                this.screen.setToolTip(list2);
+            }
+
         }
 
         protected void drawIcon(PoseStack poseStack, int x, int y, ResourceLocation textureLocation) {
