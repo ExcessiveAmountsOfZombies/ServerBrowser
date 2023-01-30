@@ -1,11 +1,8 @@
 package com.epherical.serverbrowser.client;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.fabricmc.api.ClientModInitializer;
-import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
-import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -31,7 +28,6 @@ public class ServerBrowserFabClient implements ClientModInitializer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
 
     }
