@@ -1,8 +1,8 @@
-package com.epherical.bozo;
+package com.epherical.serverbrowser;
 
 import net.fabricmc.api.ModInitializer;
 
-public class BozoFabric implements ModInitializer {
+public class ServerBrowserFabric implements ModInitializer {
 
 
     @Override
