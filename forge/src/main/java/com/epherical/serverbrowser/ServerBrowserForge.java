@@ -1,6 +1,7 @@
-package com.epherical.bozo;
+package com.epherical.serverbrowser;
 
-import com.epherical.bozo.client.AModClient;
+import com.epherical.serverbrowser.client.ServerBrowserForgeClient;
+import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.DistExecutor;
@@ -9,13 +10,13 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-@Mod("bozoID")
-public class AMod {
+@Mod("serverbrowser")
+public class ServerBrowserForge {
 
-    private static AMod mod;
+    private static ServerBrowserForge mod;
 
 
-    public AMod() {
+    public ServerBrowserForge() {
         mod = this;
         CommonPlatform.create(new ForgePlatform());
 
@@ -26,8 +27,8 @@ public class AMod {
     }
 
     private void clientInit(FMLClientSetupEvent event) {
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> AModClient::initClient);
-        MinecraftForge.EVENT_BUS.register(new AModClient());
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ServerBrowserForgeClient::initClient);
+        MinecraftForge.EVENT_BUS.register(new ServerBrowserForgeClient());
     }
 
     private void commonInit(FMLCommonSetupEvent event) {

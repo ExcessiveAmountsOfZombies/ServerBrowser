@@ -1,38 +1,35 @@
 {
   "schemaVersion": 1,
-  "id": "bozoid",
+  "id": "serverbrowser",
   "version": "${version}",
-  "name": "BOZOID",
-  "description": "",
+  "name": "Server Browser",
+  "description": "A mod that adds a server browser to make finding modpack servers easier.",
   "authors": [
     "Thonk"
   ],
   "contact": {
-    "sources": "https://github.com/ExcessiveAmountsOfZombies/Professions",
-    "issues": "https://github.com/ExcessiveAmountsOfZombies/Professions/issues",
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/professions-fabric",
+    "sources": "https://github.com/ExcessiveAmountsOfZombies/ServerBrowser",
+    "issues": "https://github.com/ExcessiveAmountsOfZombies/ServerBrowser/issues",
     "irc": "https://discord.gg/GZjtAn3F6W"
   },
-  "license": "LGPL-3.0",
+  "license": "ARR",
   "icon": "assets/professions/icon.png",
   "environment": "*",
+  "accessWidener": "serverbrowser.accesswidener",
   "entrypoints": {
     "main": [
-      "com.epherical.bozo.BozoFabric"
+      "com.epherical.serverbrowser.ServerBrowserFabric"
+    ],
+    "client": [
+      "com.epherical.serverbrowser.client.ServerBrowserFabClient"
     ]
   },
   "mixins": [
-    "bozoiD.mixins.json"
+    "serverbrowser.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.13.3",
     "fabric": "*",
-    "minecraft": "1.18.2"
-  },
-  "custom": {
-    "waila:plugins": {
-      "id": "professions:prof_waila",
-      "initializer": "com.epherical.professions.integration.wthit.ProfWailaPlugin"
-    }
+    "minecraft": "1.19.2"
   }
 }

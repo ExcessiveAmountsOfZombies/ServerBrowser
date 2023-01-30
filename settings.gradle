@@ -12,7 +12,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'FabForgeTemplate'
+rootProject.name = 'ServerBrowser'
 
 include 'forge'
 include 'fabric'

@@ -1,11 +1,13 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.epherical.bozo.mixin",
+  "package": "com.epherical.serverbrowser.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ServerSelectionMixin"
   ],
   "client": [
+    "JoinMultiplayerScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

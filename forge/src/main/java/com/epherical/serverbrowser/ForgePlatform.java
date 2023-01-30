@@ -1,4 +1,4 @@
-package com.epherical.bozo;
+package com.epherical.serverbrowser;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.loading.FMLEnvironment;

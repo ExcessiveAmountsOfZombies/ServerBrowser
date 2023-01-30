@@ -61,7 +61,7 @@ dependencies {
 }
 
 loom {
-    //accessWidenerPath = file("src/main/resources/bozoiD.accesswidener")
+    accessWidenerPath = file("src/main/resources/serverbrowser.accesswidener")
 
     runs {
         client {

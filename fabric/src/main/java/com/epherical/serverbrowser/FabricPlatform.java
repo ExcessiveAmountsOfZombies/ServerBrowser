@@ -1,4 +1,4 @@
-package com.epherical.bozo;
+package com.epherical.serverbrowser;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -23,9 +23,9 @@ public class FabricPlatform extends CommonPlatform<FabricPlatform> {
         return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
     }
 
-    /*@Override
+    @Override
     public Path getRootConfigPath() {
-        return FabricLoader.getInstance().getConfigDir().resolve("BOZO_ID");
-    }*/
+        return FabricLoader.getInstance().getConfigDir().resolve("ServerBrowser");
+    }
 
 }
