@@ -20,6 +20,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -73,6 +74,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
         entries.clear();
         this.clearEntries();
 
+        // TODO; crashes game
         JsonArray array = ServerBrowserFabClient.servers.getAsJsonArray();
 
         for (JsonElement element : array) {
@@ -96,7 +98,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
     public abstract static class Entry extends ObjectSelectionList.Entry<Entry> {
     }
 
-    public static class BrowsedEntry extends Entry {
+    public class BrowsedEntry extends Entry {
 
         private final ServerBrowserScreen screen;
 
@@ -117,6 +119,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
 
         private final Minecraft minecraft;
         private final ServerData serverData;
+        private long lastClickTime;
 
 
         public BrowsedEntry(ServerBrowserScreen screen, JsonObject object, Minecraft minecraft) {
@@ -135,7 +138,14 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             this.bgColor = object.get("backgroundColor").getAsInt();
             this.minecraft = minecraft;
 
-            this.iconLocation = new ResourceLocation("servers/" + Hashing.sha1().hashUnencodedChars(ipAddress) + "/icon");
+            String ip;
+            if (port != 0) {
+                ip = this.ipAddress + ":" + port;
+            } else {
+                ip = this.ipAddress;
+            }
+
+            this.iconLocation = new ResourceLocation("servers/" + Hashing.sha1().hashUnencodedChars(ip) + "/icon");
             AbstractTexture abstractTexture = minecraft.getTextureManager().getTexture(this.iconLocation, MissingTextureAtlasSprite.getTexture());
             if (abstractTexture != MissingTextureAtlasSprite.getTexture() && abstractTexture instanceof DynamicTexture) {
                 this.icon = (DynamicTexture) abstractTexture;
@@ -143,6 +153,26 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             this.serverData = new ServerData(serverName, ipAddress, false);
         }
 
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            double d = mouseX - (double) ServerBrowserList.this.getRowLeft();
+            if (d <= 32.0) {
+                if (d < 32.0 && d > 16.0 && this.canJoin()) {
+                    this.screen.setSelected(this);
+                    this.screen.joinSelectedServer();
+                    return true;
+                }
+            }
+
+            this.screen.setSelected(this);
+            if (Util.getMillis() - this.lastClickTime < 250L) {
+                this.screen.joinSelectedServer();
+            }
+
+            this.lastClickTime = Util.getMillis();
+            return false;
+        }
 
         @Override
         public Component getNarration() {
@@ -159,7 +189,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
                 THREAD_POOL.submit(() -> {
                     try {
                         this.screen.getPinger().pingServer(this.serverData, () -> {
-                            //this.minecraft.execute(this::updateServerList);
+                            this.minecraft.execute(() -> {});
                         });
                     } catch (UnknownHostException var2) {
                         this.serverData.ping = -1L;
@@ -253,32 +283,16 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
                 RenderSystem.setShader(GameRenderer::getPositionTexShader);
                 RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                 int o = mouseX - left;
-                int p = mouseY - top;
                 if (this.canJoin()) {
                     List<Component> components = tags.stream().map(Component::literal).collect(Collectors.toList());
                     screen.setToolTip(components);
-                    if (o < 32 && o > 16) {
+                    // TODO; background hovering here
+                    /*if (o < 32 && o > 16) {
                         GuiComponent.blit(poseStack, left, top, 0.0F, 32.0F, 32, 32, 256, 256);
                     } else {
                         GuiComponent.blit(poseStack, left, top, 0.0F, 0.0F, 32, 32, 256, 256);
-                    }
+                    }*/
                 }
-
-                if (index > 0) {
-                    if (o < 16 && p < 16) {
-                        GuiComponent.blit(poseStack, left, top, 96.0F, 32.0F, 32, 32, 256, 256);
-                    } else {
-                        GuiComponent.blit(poseStack, left, top, 96.0F, 0.0F, 32, 32, 256, 256);
-                    }
-                }
-
-                /*if (index < this.screen.getServers().size() - 1) {
-                    if (o < 16 && p > 16) {
-                        GuiComponent.blit(poseStack, left, top, 64.0F, 32.0F, 32, 32, 256, 256);
-                    } else {
-                        GuiComponent.blit(poseStack, left, top, 64.0F, 0.0F, 32, 32, 256, 256);
-                    }
-                }*/
             }
 
             if (m >= width - 15 && m <= width - 5 && n >= 0 && n <= 8) {
@@ -328,6 +342,10 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
 
         private boolean canJoin() {
             return true;
+        }
+
+        public ServerData getServerData() {
+            return serverData;
         }
     }
 }
