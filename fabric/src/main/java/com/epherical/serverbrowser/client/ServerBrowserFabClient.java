@@ -20,7 +20,7 @@ public class ServerBrowserFabClient implements ClientModInitializer {
         try {
             URIBuilder builder = new URIBuilder("http://localhost:8080/api/v1/servers");
             builder.addParameter("type", "Survival");
-            builder.addParameter("type", "PvP");
+            builder.addParameter("type", "AOF5");
             URL url = builder.build().toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
