@@ -46,6 +46,12 @@ public class ServerBrowserScreen extends Screen {
         this.joinButton = this.addRenderableWidget(Button.builder(Component.translatable("selectServer.select"), (button) -> {
             this.joinSelectedServer();
         }).bounds(this.width / 2 - 154, this.height - 52, 100, 20).build());
+        this.addRenderableWidget(Button.builder(Component.translatable("Filter Servers"), (button) -> {
+
+        }).bounds(this.width / 2 - 50, this.height - 52, 100, 20).build());
+        this.addRenderableWidget(Button.builder(Component.translatable("History"), (button) -> {
+            // todo; store 20 servers last joined from this screen.
+        }).bounds(this.width / 2 + 54, this.height - 52, 100, 20).build());
         this.favoriteButton = this.addRenderableWidget(Button.builder(Component.translatable("Favorite"), (button) -> {
             ServerList serverList = new ServerList(this.minecraft);
             ServerBrowserList.Entry entry = this.list.getSelected();
