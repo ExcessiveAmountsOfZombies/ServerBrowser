@@ -3,10 +3,13 @@ package com.epherical.serverbrowser.client;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import net.fabricmc.api.ClientModInitializer;
+import org.apache.http.client.utils.URIBuilder;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.http.HttpClient;
 
 public class ServerBrowserFabClient implements ClientModInitializer {
 
@@ -15,7 +18,10 @@ public class ServerBrowserFabClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         try {
-            URL url = new URL("http://localhost:8080/api/v1/servers?type=Survival");
+            URIBuilder builder = new URIBuilder("http://localhost:8080/api/v1/servers");
+            builder.addParameter("type", "Survival");
+            builder.addParameter("type", "PvP");
+            URL url = builder.build().toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             int responseCode = connection.getResponseCode();
@@ -25,7 +31,7 @@ public class ServerBrowserFabClient implements ClientModInitializer {
                 servers = JsonParser.parseString(string);
             }
             connection.disconnect();
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
 
