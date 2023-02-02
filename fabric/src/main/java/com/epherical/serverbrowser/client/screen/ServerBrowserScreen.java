@@ -1,5 +1,7 @@
 package com.epherical.serverbrowser.client.screen;
 
+import com.epherical.serverbrowser.client.Filter;
+import com.epherical.serverbrowser.client.ServerBrowserFabClient;
 import com.epherical.serverbrowser.client.list.ServerBrowserList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -44,28 +46,12 @@ public class ServerBrowserScreen extends Screen {
     public ServerBrowserScreen(Screen previousScreen) {
         super(Component.nullToEmpty(""));
         this.previousScreen = previousScreen;
-        try {
-            URIBuilder builder = new URIBuilder("http://localhost:8080/api/v1/servers");
-            builder.addParameter("type", "Mineshafts & Monsters");
-            //builder.addParameter("type", "AOF5");
-            URL url = builder.build().toURL();
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                byte[] bytes = connection.getInputStream().readAllBytes();
-                String string = new String(bytes);
-                servers = JsonParser.parseString(string);
-            }
-            connection.disconnect();
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
-        }
     }
 
 
     @Override
     protected void init() {
+        queryServers();
         list = new ServerBrowserList(this, this.minecraft, this.width, this.height, 32, this.height - 64, 36);
         list.queryServers();
 
@@ -107,6 +93,28 @@ public class ServerBrowserScreen extends Screen {
         super.render(poseStack, mouseX, mouseY, partialTick);
         if (this.toolTip != null) {
             this.renderComponentTooltip(poseStack, this.toolTip, mouseX, mouseY);
+        }
+    }
+
+    public void queryServers() {
+        try {
+            URIBuilder builder = new URIBuilder("http://localhost:8080/api/v1/servers");
+            for (Filter filter : ServerBrowserFabClient.filters) {
+                builder.addParameter("type", filter.getTagName());
+            }
+            //builder.addParameter("type", "AOF5");
+            URL url = builder.build().toURL();
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                byte[] bytes = connection.getInputStream().readAllBytes();
+                String string = new String(bytes);
+                servers = JsonParser.parseString(string);
+            }
+            connection.disconnect();
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
         }
     }
 
