@@ -1,6 +1,8 @@
 package com.epherical.serverbrowser.client.screen;
 
-import com.epherical.serverbrowser.client.ServerBrowserList;
+import com.epherical.serverbrowser.client.list.ServerBrowserList;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -13,8 +15,13 @@ import net.minecraft.client.multiplayer.ServerStatusPinger;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import org.apache.http.client.utils.URIBuilder;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
@@ -32,9 +39,28 @@ public class ServerBrowserScreen extends Screen {
 
     private Screen previousScreen;
 
+    public static JsonElement servers;
+
     public ServerBrowserScreen(Screen previousScreen) {
         super(Component.nullToEmpty(""));
         this.previousScreen = previousScreen;
+        try {
+            URIBuilder builder = new URIBuilder("http://localhost:8080/api/v1/servers");
+            builder.addParameter("type", "Mineshafts & Monsters");
+            //builder.addParameter("type", "AOF5");
+            URL url = builder.build().toURL();
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                byte[] bytes = connection.getInputStream().readAllBytes();
+                String string = new String(bytes);
+                servers = JsonParser.parseString(string);
+            }
+            connection.disconnect();
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -47,7 +73,7 @@ public class ServerBrowserScreen extends Screen {
             this.joinSelectedServer();
         }).bounds(this.width / 2 - 154, this.height - 52, 100, 20).build());
         this.addRenderableWidget(Button.builder(Component.translatable("Filter Servers"), (button) -> {
-
+            this.minecraft.setScreen(new FilterServerScreen(this));
         }).bounds(this.width / 2 - 50, this.height - 52, 100, 20).build());
         this.addRenderableWidget(Button.builder(Component.translatable("History"), (button) -> {
             // todo; store 20 servers last joined from this screen.
