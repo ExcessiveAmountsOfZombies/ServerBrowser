@@ -9,6 +9,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Checkbox;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -16,7 +18,6 @@ import org.apache.http.client.utils.URIBuilder;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -37,8 +38,18 @@ public class FilterServerScreen extends Screen {
     @Override
     protected void init() {
         queryTags();
-        list = new TagList(this, this.minecraft, this.width, this.height, 32, this.height - 64, 36);
+        list = new TagList(this, this.minecraft, this.width, this.height, 32, this.height - 64, 25);
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_CANCEL, (button) -> {
+            List<Filter> filters = new ArrayList<>();
+            for (TagList.Entry child : list.children()) {
+                for (GuiEventListener listener : child.children()) {
+                    Checkbox checkbox = (Checkbox) listener;
+                    String string = checkbox.getMessage().getString();
+                    boolean active = checkbox.selected();
+                    filters.add(new Filter(string, active));
+                }
+            }
+            ServerBrowserFabClient.clearAndReset(filters);
             this.minecraft.setScreen(previousScreen);
         }).bounds(this.width / 2 + 4 + 76, this.height - 28, 75, 20).build());
 

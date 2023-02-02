@@ -20,6 +20,10 @@ public class Filter {
         return tagName;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

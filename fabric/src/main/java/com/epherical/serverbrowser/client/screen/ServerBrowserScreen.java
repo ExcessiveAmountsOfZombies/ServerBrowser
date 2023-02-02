@@ -61,7 +61,7 @@ public class ServerBrowserScreen extends Screen {
         this.addRenderableWidget(Button.builder(Component.translatable("Filter Servers"), (button) -> {
             this.minecraft.setScreen(new FilterServerScreen(this));
         }).bounds(this.width / 2 - 50, this.height - 52, 100, 20).build());
-        this.addRenderableWidget(Button.builder(Component.translatable("History"), (button) -> {
+        this.addRenderableWidget(Button.builder(Component.translatable("History (WIP)"), (button) -> {
             // todo; store 20 servers last joined from this screen.
         }).bounds(this.width / 2 + 54, this.height - 52, 100, 20).build());
         this.favoriteButton = this.addRenderableWidget(Button.builder(Component.translatable("Favorite"), (button) -> {
@@ -100,7 +100,9 @@ public class ServerBrowserScreen extends Screen {
         try {
             URIBuilder builder = new URIBuilder("http://localhost:8080/api/v1/servers");
             for (Filter filter : ServerBrowserFabClient.filters) {
-                builder.addParameter("type", filter.getTagName());
+                if (filter.isActive()) {
+                    builder.addParameter("type", filter.getTagName());
+                }
             }
             //builder.addParameter("type", "AOF5");
             URL url = builder.build().toURL();
