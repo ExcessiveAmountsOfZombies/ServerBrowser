@@ -1,4 +1,4 @@
-package com.epherical.serverbrowser.client;
+package com.epherical.serverbrowser.client.list;
 
 import com.epherical.serverbrowser.client.screen.ServerBrowserScreen;
 import com.google.common.hash.Hashing;
@@ -17,10 +17,8 @@ import net.minecraft.DefaultUncaughtExceptionHandler;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.ObjectSelectionList;
-import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -28,7 +26,6 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import org.apache.commons.lang3.Validate;
@@ -43,6 +40,8 @@ import java.util.Objects;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
+
+import static com.epherical.serverbrowser.client.screen.ServerBrowserScreen.servers;
 
 public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Entry> {
 
@@ -74,8 +73,10 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
         entries.clear();
         this.clearEntries();
 
-        // TODO; crashes game
-        JsonArray array = ServerBrowserFabClient.servers.getAsJsonArray();
+        JsonArray array = new JsonArray();
+        if (servers != null) {
+            array = servers.getAsJsonArray();
+        }
 
         for (JsonElement element : array) {
             JsonObject object = (JsonObject) element;
@@ -189,7 +190,8 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
                 THREAD_POOL.submit(() -> {
                     try {
                         this.screen.getPinger().pingServer(this.serverData, () -> {
-                            this.minecraft.execute(() -> {});
+                            this.minecraft.execute(() -> {
+                            });
                         });
                     } catch (UnknownHostException var2) {
                         this.serverData.ping = -1L;
