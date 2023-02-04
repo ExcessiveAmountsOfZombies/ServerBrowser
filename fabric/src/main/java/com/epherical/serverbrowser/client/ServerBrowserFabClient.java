@@ -1,5 +1,8 @@
 package com.epherical.serverbrowser.client;
 
+import com.epherical.serverbrowser.Config;
+import com.epherical.serverbrowser.ConfigSettings;
+import com.epherical.serverbrowser.FabricPlatform;
 import net.fabricmc.api.ClientModInitializer;
 
 import java.util.LinkedHashSet;
@@ -13,9 +16,13 @@ public class ServerBrowserFabClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        FabricPlatform.create(new FabricPlatform());
+        Config config = new Config();
+        ConfigSettings settings = config.loadConfig();
         filters = new LinkedHashSet<>();
-        // TODO; pull from config
-        filters.add(new Filter("ATM6", true));
+        if (settings != null && settings.modPackFilter.length() > 0)  {
+            filters.add(new Filter(settings.modPackFilter));
+        }
     }
 
     public static void mergeFilters(List<Filter> filter) {
