@@ -147,7 +147,7 @@ public class ServerBrowserScreen extends Screen {
     }
 
     private void refreshServerList() {
-        this.minecraft.setScreen(new ServerBrowserScreen(this.previousScreen));
+        list.refreshServers();
     }
 
     public ServerStatusPinger getPinger() {

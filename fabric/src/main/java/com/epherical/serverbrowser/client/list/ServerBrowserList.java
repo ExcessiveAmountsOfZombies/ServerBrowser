@@ -26,6 +26,7 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import org.apache.commons.lang3.Validate;
@@ -68,6 +69,12 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
         this.screen = screen;
     }
 
+    public void refreshServers() {
+        for (BrowsedEntry entry : entries) {
+            entry.getServerData().pinged = false;
+        }
+    }
+
 
     public void queryServers() {
         entries.clear();
@@ -106,7 +113,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
         private final String serverName;
         private final String ipAddress;
         private final int port;
-        private final String description;
+        private final Component description;
         private final List<String> tags;
         private final int rank;
         private final int bgColor;
@@ -128,7 +135,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             this.serverName = object.get("serverName").getAsString();
             this.ipAddress = object.get("ipAddress").getAsString();
             this.port = object.get("port").getAsInt();
-            this.description = object.get("description").getAsString();
+            this.description = Component.literal(object.get("description").getAsString());
             List<String> tags = new ArrayList<>();
             JsonArray array = object.getAsJsonArray("tags");
             for (JsonElement tag : array) {
@@ -286,7 +293,28 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
                 RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                 int o = mouseX - left;
                 if (this.canJoin()) {
-                    List<Component> components = tags.stream().map(Component::literal).collect(Collectors.toList());
+                    int currentLength = 0;
+                    int maxLength = 150;
+                    List<String> condensedTags = new ArrayList<>();
+                    condensedTags.add("Tags");
+                    StringBuilder condenser = new StringBuilder();
+                    tags.sort(String::compareTo);
+                    for (String tag : tags) {
+                        if (currentLength >= maxLength) {
+                            currentLength = 0;
+                            condensedTags.add(condenser.append(",").toString());
+                            condenser = new StringBuilder();
+                        } else {
+                            if (condenser.length() == 0) {
+                                condenser.append(tag);
+                            } else {
+                                condenser.append(", ").append(tag);
+                            }
+                        }
+                        currentLength += minecraft.font.width(tag);
+                    }
+                    condensedTags.add(condenser.toString());
+                    List<Component> components = condensedTags.stream().map(Component::literal).collect(Collectors.toList());
                     screen.setToolTip(components);
                     // TODO; background hovering here
                     /*if (o < 32 && o > 16) {
