@@ -75,6 +75,9 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
         }
     }
 
+    public List<BrowsedEntry> getEntries() {
+        return entries;
+    }
 
     public void queryServers() {
         entries.clear();

@@ -43,6 +43,8 @@ public class ServerBrowserScreen extends Screen {
 
     public static JsonElement servers;
 
+    private int page = 1;
+
     public ServerBrowserScreen(Screen previousScreen) {
         super(Component.nullToEmpty(""));
         this.previousScreen = previousScreen;
@@ -54,6 +56,28 @@ public class ServerBrowserScreen extends Screen {
         queryServers();
         list = new ServerBrowserList(this, this.minecraft, this.width, this.height, 32, this.height - 64, 36);
         list.queryServers();
+
+        if (list.getEntries().size() >= 20) {
+            Button nextButton = this.addRenderableWidget(Button.builder(Component.translatable("Next: " + (page + 1)), button -> {
+                if (list.getEntries().size() >= 20) {
+                    page++;
+                    queryServers();
+                    list.queryServers();
+                    button.setMessage(Component.translatable("Next: " + (page + 1)));
+                }
+            }).bounds(this.width - 110, 12, 60, 20).build());
+            this.addRenderableWidget(Button.builder(Component.translatable("Prev"), button -> {
+                if (page <= 1) {
+                    page = 1;
+                } else {
+                    page--;
+                    queryServers();
+                    list.queryServers();
+                }
+                nextButton.setMessage(Component.translatable("Next: " + (page + 1)));
+            }).bounds(this.width - 140, 12, 30, 20).build());
+        }
+
 
         this.joinButton = this.addRenderableWidget(Button.builder(Component.translatable("selectServer.select"), (button) -> {
             this.joinSelectedServer();
@@ -99,6 +123,9 @@ public class ServerBrowserScreen extends Screen {
     public void queryServers() {
         try {
             URIBuilder builder = new URIBuilder("http://localhost:8080/api/v1/servers");
+            if (page > 1) {
+                builder.addParameter("page", String.valueOf(page));
+            }
             for (Filter filter : ServerBrowserFabClient.filters) {
                 if (filter.isActive()) {
                     builder.addParameter("type", filter.getTagName());
