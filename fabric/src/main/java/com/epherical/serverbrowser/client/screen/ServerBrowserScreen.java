@@ -58,15 +58,15 @@ public class ServerBrowserScreen extends Screen {
         list.queryServers();
 
         if (list.getEntries().size() >= 20) {
-            Button nextButton = this.addRenderableWidget(Button.builder(Component.translatable("Next: " + (page + 1)), button -> {
+            Button nextButton = this.addRenderableWidget(new Button(this.width - 110, 12, 60, 20, Component.translatable("Next: " + (page + 1)), button -> {
                 if (list.getEntries().size() >= 20) {
                     page++;
                     queryServers();
                     list.queryServers();
                     button.setMessage(Component.translatable("Next: " + (page + 1)));
                 }
-            }).bounds(this.width - 110, 12, 60, 20).build());
-            this.addRenderableWidget(Button.builder(Component.translatable("Prev"), button -> {
+            }));
+            this.addRenderableWidget(new Button(this.width - 140, 12, 30, 20, Component.translatable("Prev"), button -> {
                 if (page <= 1) {
                     page = 1;
                 } else {
@@ -75,20 +75,20 @@ public class ServerBrowserScreen extends Screen {
                     list.queryServers();
                 }
                 nextButton.setMessage(Component.translatable("Next: " + (page + 1)));
-            }).bounds(this.width - 140, 12, 30, 20).build());
+            }));
         }
 
 
-        this.joinButton = this.addRenderableWidget(Button.builder(Component.translatable("selectServer.select"), (button) -> {
+        this.joinButton = this.addRenderableWidget(new Button(this.width / 2 - 154, this.height - 52, 100, 20, Component.translatable("selectServer.select"), (button) -> {
             this.joinSelectedServer();
-        }).bounds(this.width / 2 - 154, this.height - 52, 100, 20).build());
-        this.addRenderableWidget(Button.builder(Component.translatable("Filter Servers"), (button) -> {
+        }));
+        this.addRenderableWidget(new Button(this.width / 2 - 50, this.height - 52, 100, 20, Component.translatable("Filter Servers"), (button) -> {
             this.minecraft.setScreen(new FilterServerScreen(this));
-        }).bounds(this.width / 2 - 50, this.height - 52, 100, 20).build());
-        this.addRenderableWidget(Button.builder(Component.translatable("History (WIP)"), (button) -> {
+        }));
+        this.addRenderableWidget(new Button(this.width / 2 + 54, this.height - 52, 100, 20, Component.translatable("History (WIP)"), (button) -> {
             // todo; store 20 servers last joined from this screen.
-        }).bounds(this.width / 2 + 54, this.height - 52, 100, 20).build());
-        this.favoriteButton = this.addRenderableWidget(Button.builder(Component.translatable("Favorite"), (button) -> {
+        }));
+        this.favoriteButton = this.addRenderableWidget(new Button(this.width / 2 - 154, this.height - 28, 70, 20, Component.translatable("Favorite"), (button) -> {
             ServerList serverList = new ServerList(this.minecraft);
             ServerBrowserList.Entry entry = this.list.getSelected();
             if (entry instanceof ServerBrowserList.BrowsedEntry browsedEntry) {
@@ -96,13 +96,13 @@ public class ServerBrowserScreen extends Screen {
                 serverList.add(serverData, false);
                 serverList.save();
             }
-        }).bounds(this.width / 2 - 154, this.height - 28, 70, 20).build());
-        this.addRenderableWidget(Button.builder(Component.translatable("selectServer.refresh"), (button) -> {
+        }));
+        this.addRenderableWidget(new Button(this.width / 2 - 80, this.height - 28, 156, 20, Component.translatable("selectServer.refresh"), (button) -> {
             this.refreshServerList();
-        }).bounds(this.width / 2 - 80, this.height - 28, 156, 20).build());
-        this.addRenderableWidget(Button.builder(CommonComponents.GUI_CANCEL, (button) -> {
+        }));
+        this.addRenderableWidget(new Button(this.width / 2 + 4 + 76, this.height - 28, 75, 20, CommonComponents.GUI_CANCEL, (button) -> {
             this.minecraft.setScreen(null);
-        }).bounds(this.width / 2 + 4 + 76, this.height - 28, 75, 20).build());
+        }));
 
         this.addWidget(list);
         onSelectedChange();

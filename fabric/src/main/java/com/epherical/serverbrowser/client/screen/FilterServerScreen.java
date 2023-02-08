@@ -39,7 +39,7 @@ public class FilterServerScreen extends Screen {
     protected void init() {
         queryTags();
         list = new TagList(this, this.minecraft, this.width, this.height, 32, this.height - 64, 25);
-        this.addRenderableWidget(Button.builder(CommonComponents.GUI_CANCEL, (button) -> {
+        this.addRenderableWidget(new Button(this.width / 2 + 4 + 76, this.height - 28, 75, 20, CommonComponents.GUI_CANCEL, (button) -> {
             List<Filter> filters = new ArrayList<>();
             for (TagList.Entry child : list.children()) {
                 for (GuiEventListener listener : child.children()) {
@@ -51,7 +51,7 @@ public class FilterServerScreen extends Screen {
             }
             ServerBrowserFabClient.clearAndReset(filters);
             this.minecraft.setScreen(previousScreen);
-        }).bounds(this.width / 2 + 4 + 76, this.height - 28, 75, 20).build());
+        }));
 
         this.addWidget(list);
     }

@@ -60,8 +60,8 @@ public class TagList extends ContainerObjectSelectionList<TagList.Entry> {
         public void render(PoseStack poseStack, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTick) {
             int itemWidth = 0;
             for (Checkbox checkbox : checkboxes) {
-                checkbox.setX(left + itemWidth);
-                checkbox.setY(top);
+                checkbox.x = (left + itemWidth);
+                checkbox.y = (top);
                 itemWidth += checkbox.getWidth();
                 checkbox.render(poseStack, mouseX, mouseY, partialTick);
             }

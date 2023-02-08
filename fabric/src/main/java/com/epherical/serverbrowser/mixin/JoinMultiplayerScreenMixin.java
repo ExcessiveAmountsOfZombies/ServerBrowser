@@ -20,8 +20,8 @@ public class JoinMultiplayerScreenMixin extends Screen {
 
     @Inject(method = "init", at = @At(value = "TAIL"))
     public void serverBrowserAddBrowserButton(CallbackInfo ci) {
-        this.addRenderableWidget(Button.builder(Component.translatable("Server Browser"), button -> {
+        this.addRenderableWidget(new Button(3, 3, 120, 20, Component.translatable("Server Browser"), button -> {
             minecraft.setScreen(new ServerBrowserScreen(this));
-        }).bounds(3, 3, 120, 20).build());
+        }));
     }
 }
