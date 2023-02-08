@@ -8,7 +8,10 @@ import com.google.gson.JsonParser;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerData;
@@ -78,7 +81,14 @@ public class ServerBrowserScreen extends Screen {
             }));
         }
 
-
+        this.addRenderableWidget(new Button(this.width / 2 - 50, 3, 100, 20, Component.literal("Register Server"), button -> {
+            this.minecraft.setScreen(new ConfirmLinkScreen((bl) -> {
+                if (bl) {
+                    Util.getPlatform().openUri("https://minecraft.multiplayerservers.net");
+                }
+                this.minecraft.setScreen(this);
+            }, "https://minecraft.multiplayerservers.net", true));
+        }));
         this.joinButton = this.addRenderableWidget(new Button(this.width / 2 - 154, this.height - 52, 100, 20, Component.translatable("selectServer.select"), (button) -> {
             this.joinSelectedServer();
         }));
