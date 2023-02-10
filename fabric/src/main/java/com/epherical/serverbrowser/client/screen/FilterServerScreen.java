@@ -1,5 +1,6 @@
 package com.epherical.serverbrowser.client.screen;
 
+import com.epherical.serverbrowser.Config;
 import com.epherical.serverbrowser.client.Filter;
 import com.epherical.serverbrowser.client.ServerBrowserFabClient;
 import com.epherical.serverbrowser.client.list.TagList;
@@ -71,6 +72,10 @@ public class FilterServerScreen extends Screen {
                 for (JsonElement jsonElement : element) {
                     JsonObject object = jsonElement.getAsJsonObject();
                     String tagName = object.get("tagName").getAsString();
+                    String category = object.get("category").getAsString();
+                    if (ServerBrowserFabClient.settings.modPackFilter.length() > 0 && category.equals("Modpack")) {
+                        continue;
+                    }
                     List<Filter> filterList = new ArrayList<>();
                     filterList.add(new Filter(tagName));
                     ServerBrowserFabClient.mergeFilters(filterList);

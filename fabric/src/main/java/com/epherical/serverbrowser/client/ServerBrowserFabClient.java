@@ -13,15 +13,16 @@ public class ServerBrowserFabClient implements ClientModInitializer {
 
 
     public static Set<Filter> filters;
+    public static ConfigSettings settings;
 
     @Override
     public void onInitializeClient() {
         FabricPlatform.create(new FabricPlatform());
         Config config = new Config();
-        ConfigSettings settings = config.loadConfig();
+        settings = config.loadConfig();
         filters = new LinkedHashSet<>();
         if (settings != null && settings.modPackFilter.length() > 0)  {
-            filters.add(new Filter(settings.modPackFilter));
+            filters.add(new Filter(settings.modPackFilter, true));
         }
     }
 
