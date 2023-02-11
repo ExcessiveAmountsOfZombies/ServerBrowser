@@ -41,6 +41,7 @@ public class ServerBrowserScreen extends Screen {
 
     @Nullable
     private List<Component> toolTip;
+    private Component websiteStatus;
 
     private Screen previousScreen;
 
@@ -128,9 +129,14 @@ public class ServerBrowserScreen extends Screen {
         if (this.toolTip != null) {
             this.renderComponentTooltip(poseStack, this.toolTip, mouseX, mouseY);
         }
+
+        if (websiteStatus != null) {
+            drawCenteredString(poseStack, minecraft.font, websiteStatus, width / 2, 40, 0xFFFFFF);
+        }
     }
 
     public void queryServers() {
+        websiteStatus = null;
         try {
             URIBuilder builder = new URIBuilder("http://localhost:8080/api/v1/servers");
             if (page > 1) {
@@ -152,8 +158,8 @@ public class ServerBrowserScreen extends Screen {
                 servers = JsonParser.parseString(string);
             }
             connection.disconnect();
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
+        } catch (IOException | URISyntaxException ignored) {
+            websiteStatus = Component.literal("Website could not be reached at the moment");
         }
     }
 
