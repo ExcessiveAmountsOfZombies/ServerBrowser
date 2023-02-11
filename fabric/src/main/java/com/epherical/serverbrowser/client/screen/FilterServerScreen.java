@@ -1,6 +1,5 @@
 package com.epherical.serverbrowser.client.screen;
 
-import com.epherical.serverbrowser.Config;
 import com.epherical.serverbrowser.client.Filter;
 import com.epherical.serverbrowser.client.ServerBrowserFabClient;
 import com.epherical.serverbrowser.client.list.TagList;
@@ -27,6 +26,8 @@ import java.util.List;
 public class FilterServerScreen extends Screen {
 
     private final Screen previousScreen;
+
+    private Component websiteStatus;
 
     protected TagList list;
 
@@ -59,6 +60,7 @@ public class FilterServerScreen extends Screen {
 
 
     public void queryTags() {
+        websiteStatus = null;
         try {
             URIBuilder builder = new URIBuilder("http://localhost:8080/api/v1/tags");
             URL url = builder.build().toURL();
@@ -83,7 +85,7 @@ public class FilterServerScreen extends Screen {
             }
             connection.disconnect();
         } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
+            websiteStatus = Component.literal("Website could not be reached at the moment");
         }
     }
 
@@ -93,5 +95,9 @@ public class FilterServerScreen extends Screen {
         this.renderBackground(poseStack);
         this.list.render(poseStack, mouseX, mouseY, partialTick);
         super.render(poseStack, mouseX, mouseY, partialTick);
+
+        if (websiteStatus != null) {
+            drawCenteredString(poseStack, minecraft.font, websiteStatus, width / 2, 40, 0xFFFFFF);
+        }
     }
 }
