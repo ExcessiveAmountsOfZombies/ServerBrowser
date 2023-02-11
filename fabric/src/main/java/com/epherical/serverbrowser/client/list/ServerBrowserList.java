@@ -1,5 +1,6 @@
 package com.epherical.serverbrowser.client.list;
 
+import com.epherical.serverbrowser.client.ServerBrowserFabClient;
 import com.epherical.serverbrowser.client.screen.ServerBrowserScreen;
 import com.google.common.hash.Hashing;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -37,6 +38,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -91,8 +93,10 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
         for (JsonElement element : array) {
             JsonObject object = (JsonObject) element;
             BrowsedEntry browsedEntry = new BrowsedEntry(screen, object, minecraft);
-            entries.add(browsedEntry);
-            this.addEntry(browsedEntry);
+            if (browsedEntry.isValid()) {
+                entries.add(browsedEntry);
+                this.addEntry(browsedEntry);
+            }
         }
     }
 
@@ -132,12 +136,20 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
         private final ServerData serverData;
         private long lastClickTime;
 
+        private boolean valid = true;
+
 
         public BrowsedEntry(ServerBrowserScreen screen, JsonObject object, Minecraft minecraft) {
             this.screen = screen;
             this.serverName = object.get("serverName").getAsString();
             this.ipAddress = object.get("ipAddress").getAsString();
             this.port = object.get("port").getAsInt();
+
+            String address = this.ipAddress.toLowerCase(Locale.ROOT);
+            if (ServerBrowserFabClient.getInstance().getSettings().getBlacklistedServers().contains(address)) {
+                this.valid = false;
+            }
+
             this.description = Component.literal(object.get("description").getAsString());
             List<String> tags = new ArrayList<>();
             JsonArray array = object.getAsJsonArray("tags");
@@ -334,6 +346,10 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
                 this.screen.setToolTip(list2);
             }
 
+        }
+
+        public boolean isValid() {
+            return valid;
         }
 
         protected void drawIcon(PoseStack poseStack, int x, int y, ResourceLocation textureLocation) {
