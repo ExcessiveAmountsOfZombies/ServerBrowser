@@ -10,6 +10,7 @@ public class ConfigSettings {
 
     public String modPackFilter = "";
     public List<OfficialServer> officialServers = new ArrayList<>();
+    public List<String> blacklistedServers = new ArrayList<>();
 
 
     public void setModPackFilter(String modPackFilter) {
@@ -26,6 +27,14 @@ public class ConfigSettings {
 
     public void setOfficialServers(List<OfficialServer> officialServers) {
         this.officialServers = officialServers;
+    }
+
+    public void setBlacklistedServers(List<String> blacklistedServers) {
+        this.blacklistedServers = blacklistedServers;
+    }
+
+    public List<String> getBlacklistedServers() {
+        return blacklistedServers;
     }
 
     public void addOfficialServer(OfficialServer officialServer) {
