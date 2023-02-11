@@ -4,6 +4,7 @@
   "package": "com.epherical.serverbrowser.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ServerSelectionMixin"
   ],
   "client": [
     "JoinMultiplayerScreenMixin"

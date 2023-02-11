@@ -50,7 +50,7 @@ public class FilterServerScreen extends Screen {
                     filters.add(new Filter(string, active));
                 }
             }
-            ServerBrowserFabClient.clearAndReset(filters);
+            ServerBrowserFabClient.getInstance().clearAndReset(filters);
             this.minecraft.setScreen(previousScreen);
         }).bounds(this.width / 2 + 4 + 76, this.height - 28, 75, 20).build());
 
@@ -73,12 +73,12 @@ public class FilterServerScreen extends Screen {
                     JsonObject object = jsonElement.getAsJsonObject();
                     String tagName = object.get("tagName").getAsString();
                     String category = object.get("category").getAsString();
-                    if (ServerBrowserFabClient.settings.modPackFilter.length() > 0 && category.equals("Modpack")) {
+                    if (ServerBrowserFabClient.getInstance().getSettings().modPackFilter.length() > 0 && category.equals("Modpack")) {
                         continue;
                     }
                     List<Filter> filterList = new ArrayList<>();
                     filterList.add(new Filter(tagName));
-                    ServerBrowserFabClient.mergeFilters(filterList);
+                    ServerBrowserFabClient.getInstance().mergeFilters(filterList);
                 }
             }
             connection.disconnect();

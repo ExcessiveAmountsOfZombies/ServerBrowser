@@ -136,7 +136,7 @@ public class ServerBrowserScreen extends Screen {
             if (page > 1) {
                 builder.addParameter("page", String.valueOf(page));
             }
-            for (Filter filter : ServerBrowserFabClient.filters) {
+            for (Filter filter : ServerBrowserFabClient.getInstance().getFilters()) {
                 if (filter.isActive()) {
                     builder.addParameter("type", filter.getTagName());
                 }

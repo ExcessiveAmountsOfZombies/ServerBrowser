@@ -11,12 +11,14 @@ import java.util.Set;
 
 public class ServerBrowserFabClient implements ClientModInitializer {
 
+    private static ServerBrowserFabClient client;
 
-    public static Set<Filter> filters;
-    public static ConfigSettings settings;
+    private Set<Filter> filters;
+    private ConfigSettings settings;
 
     @Override
     public void onInitializeClient() {
+        client = this;
         FabricPlatform.create(new FabricPlatform());
         Config config = new Config();
         settings = config.loadConfig();
@@ -26,13 +28,25 @@ public class ServerBrowserFabClient implements ClientModInitializer {
         }
     }
 
-    public static void mergeFilters(List<Filter> filter) {
+    public void mergeFilters(List<Filter> filter) {
         filter.removeAll(filters);
         filters.addAll(filter);
     }
 
-    public static void clearAndReset(List<Filter> filter) {
+    public void clearAndReset(List<Filter> filter) {
         filters.clear();
         filters.addAll(filter);
+    }
+
+    public Set<Filter> getFilters() {
+        return filters;
+    }
+
+    public static ServerBrowserFabClient getInstance() {
+        return client;
+    }
+
+    public ConfigSettings getSettings() {
+        return settings;
     }
 }
