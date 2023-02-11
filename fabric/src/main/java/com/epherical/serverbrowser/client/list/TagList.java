@@ -26,7 +26,7 @@ public class TagList extends ContainerObjectSelectionList<TagList.Entry> {
     public TagList(FilterServerScreen screen, Minecraft minecraft, int i, int j, int k, int l, int m) {
         super(minecraft, i, j, k, l, m);
 
-        Iterable<List<Filter>> partition = Iterables.partition(ServerBrowserFabClient.filters.stream()
+        Iterable<List<Filter>> partition = Iterables.partition(ServerBrowserFabClient.getInstance().getFilters().stream()
                 .sorted(Comparator.comparing(Filter::isActive).reversed().thenComparing(Filter::getTagName)).collect(Collectors.toList()), 2);
         partition.forEach(filters -> {
             TagEntry entry = new TagEntry(filters.toArray(new Filter[0]));

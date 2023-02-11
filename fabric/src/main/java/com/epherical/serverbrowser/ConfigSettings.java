@@ -1,9 +1,15 @@
 package com.epherical.serverbrowser;
 
+import com.epherical.serverbrowser.client.OfficialServer;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class ConfigSettings {
 
 
     public String modPackFilter = "";
+    public List<OfficialServer> officialServers = new ArrayList<>();
 
 
     public void setModPackFilter(String modPackFilter) {
@@ -12,5 +18,17 @@ public class ConfigSettings {
 
     public String getModPackFilter() {
         return modPackFilter;
+    }
+
+    public List<OfficialServer> getOfficialServers() {
+        return officialServers;
+    }
+
+    public void setOfficialServers(List<OfficialServer> officialServers) {
+        this.officialServers = officialServers;
+    }
+
+    public void addOfficialServer(OfficialServer officialServer) {
+        this.officialServers.add(officialServer);
     }
 }
