@@ -62,7 +62,7 @@ public class FilterServerScreen extends Screen {
     public void queryTags() {
         websiteStatus = null;
         try {
-            URIBuilder builder = new URIBuilder("http://localhost:8080/api/v1/tags");
+            URIBuilder builder = new URIBuilder(ServerBrowserFabClient.URL + "/api/v1/tags");
             URL url = builder.build().toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");

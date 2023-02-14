@@ -35,16 +35,18 @@ public class TagList extends ContainerObjectSelectionList<TagList.Entry> {
     }
 
     protected int getScrollbarPosition() {
-        return super.getScrollbarPosition() + 30;
+        return this.width - 10;
     }
 
     public int getRowWidth() {
-        return super.getRowWidth() + 85;
+        return this.width - 10;
     }
 
 
     @Environment(EnvType.CLIENT)
     public class TagEntry extends Entry {
+
+        private static int widest = 0;
 
         private final List<Checkbox> checkboxes;
 
@@ -59,12 +61,21 @@ public class TagList extends ContainerObjectSelectionList<TagList.Entry> {
         @Override
         public void render(PoseStack poseStack, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTick) {
             int itemWidth = 0;
+            int increment = 0;
             for (Checkbox checkbox : checkboxes) {
                 checkbox.setX(left + itemWidth);
                 checkbox.setY(top);
                 itemWidth += checkbox.getWidth();
+                if (increment == 0 && itemWidth >= widest) {
+                    widest = itemWidth;
+                }
+                if (increment == 1) {
+                    checkbox.x = (left + widest);
+                }
                 checkbox.render(poseStack, mouseX, mouseY, partialTick);
+                increment++;
             }
+            increment = 0;
         }
 
         @Override
