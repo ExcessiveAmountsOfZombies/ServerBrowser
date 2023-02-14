@@ -11,6 +11,8 @@ import java.util.Set;
 
 public class ServerBrowserFabClient implements ClientModInitializer {
 
+    public static String URL = "https://minecraft.multiplayerservers.net";
+
     private static ServerBrowserFabClient client;
 
     private Set<Filter> filters;

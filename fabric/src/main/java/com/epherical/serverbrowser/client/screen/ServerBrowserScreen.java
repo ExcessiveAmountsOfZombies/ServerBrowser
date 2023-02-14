@@ -9,7 +9,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.Util;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConnectScreen;
@@ -138,7 +137,7 @@ public class ServerBrowserScreen extends Screen {
     public void queryServers() {
         websiteStatus = null;
         try {
-            URIBuilder builder = new URIBuilder("http://localhost:8080/api/v1/servers");
+            URIBuilder builder = new URIBuilder(ServerBrowserFabClient.URL + "/api/v1/servers");
             if (page > 1) {
                 builder.addParameter("page", String.valueOf(page));
             }
