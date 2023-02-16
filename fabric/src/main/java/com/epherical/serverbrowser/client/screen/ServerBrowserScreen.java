@@ -81,14 +81,14 @@ public class ServerBrowserScreen extends Screen {
             }).bounds(this.width - 140, 12, 30, 20).build());
         }
 
-        this.addRenderableWidget(new Button(this.width / 2 - 50, 3, 100, 20, Component.literal("Register Server"), button -> {
+        this.addRenderableWidget(Button.builder(Component.literal("Register Server"), button -> {
             this.minecraft.setScreen(new ConfirmLinkScreen((bl) -> {
                 if (bl) {
                     Util.getPlatform().openUri("https://minecraft.multiplayerservers.net");
                 }
                 this.minecraft.setScreen(this);
             }, "https://minecraft.multiplayerservers.net", true));
-        }));
+        }).bounds(this.width / 2 - 50, 3, 100, 20).build());
         this.joinButton = this.addRenderableWidget(Button.builder(Component.translatable("selectServer.select"), (button) -> {
             this.joinSelectedServer();
         }).bounds(this.width / 2 - 154, this.height - 52, 100, 20).build());

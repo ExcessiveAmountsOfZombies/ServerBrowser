@@ -70,7 +70,7 @@ public class TagList extends ContainerObjectSelectionList<TagList.Entry> {
                     widest = itemWidth;
                 }
                 if (increment == 1) {
-                    checkbox.x = (left + widest);
+                    checkbox.setX((left + widest));
                 }
                 checkbox.render(poseStack, mouseX, mouseY, partialTick);
                 increment++;
