@@ -1,9 +1,7 @@
 package com.epherical.serverbrowser;
 
-import com.epherical.bozo.CommonPlatform;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +15,7 @@ public class Config {
 
     public ConfigSettings loadConfig() {
         ConfigSettings settings = null;
-        Path path = CommonPlatform.platform.getRootConfigPath().resolve("config.json");
+        Path path = CommonPlatform.platform.getRootConfigPath().resolve("serverbrowser.json");
 
         if (Files.exists(path)) {
             try {
