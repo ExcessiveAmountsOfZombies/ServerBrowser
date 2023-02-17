@@ -1,13 +1,11 @@
 package com.epherical.serverbrowser.client.screen;
 
+import com.epherical.serverbrowser.client.CommonClient;
 import com.epherical.serverbrowser.client.Filter;
-import com.epherical.serverbrowser.client.ServerBrowserFabClient;
 import com.epherical.serverbrowser.client.list.ServerBrowserList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
@@ -28,7 +26,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
-@Environment(EnvType.CLIENT)
 public class ServerBrowserScreen extends Screen {
 
 
@@ -137,11 +134,11 @@ public class ServerBrowserScreen extends Screen {
     public void queryServers() {
         websiteStatus = null;
         try {
-            URIBuilder builder = new URIBuilder(ServerBrowserFabClient.URL + "/api/v1/servers");
+            URIBuilder builder = new URIBuilder(CommonClient.URL + "/api/v1/servers");
             if (page > 1) {
                 builder.addParameter("page", String.valueOf(page));
             }
-            for (Filter filter : ServerBrowserFabClient.getInstance().getFilters()) {
+            for (Filter filter : CommonClient.getInstance().getFilters()) {
                 if (filter.isActive()) {
                     builder.addParameter("type", filter.getTagName());
                 }

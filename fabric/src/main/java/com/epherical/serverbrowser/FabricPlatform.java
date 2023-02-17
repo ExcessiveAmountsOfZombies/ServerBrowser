@@ -1,6 +1,5 @@
 package com.epherical.serverbrowser;
 
-import com.epherical.bozo.CommonPlatform;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 

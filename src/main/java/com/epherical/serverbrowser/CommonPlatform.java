@@ -1,4 +1,4 @@
-package com.epherical.bozo;
+package com.epherical.serverbrowser;
 
 import java.nio.file.Path;
 

@@ -1,6 +1,6 @@
 package com.epherical.serverbrowser.client.list;
 
-import com.epherical.serverbrowser.client.ServerBrowserFabClient;
+import com.epherical.serverbrowser.client.CommonClient;
 import com.epherical.serverbrowser.client.screen.ServerBrowserScreen;
 import com.google.common.hash.Hashing;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -11,8 +11,6 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.DefaultUncaughtExceptionHandler;
 import net.minecraft.SharedConstants;
@@ -27,7 +25,6 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import org.apache.commons.lang3.Validate;
@@ -43,8 +40,6 @@ import java.util.Objects;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
-
-import static com.epherical.serverbrowser.client.screen.ServerBrowserScreen.servers;
 
 public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Entry> {
 
@@ -86,8 +81,8 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
         this.clearEntries();
 
         JsonArray array = new JsonArray();
-        if (servers != null) {
-            array = servers.getAsJsonArray();
+        if (ServerBrowserScreen.servers != null) {
+            array = ServerBrowserScreen.servers.getAsJsonArray();
         }
 
         for (JsonElement element : array) {
@@ -109,7 +104,6 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
         return super.getRowWidth() + 85;
     }
 
-    @Environment(EnvType.CLIENT)
     public abstract static class Entry extends ObjectSelectionList.Entry<Entry> {
     }
 
@@ -146,7 +140,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             this.port = object.get("port").getAsInt();
 
             String address = this.ipAddress.toLowerCase(Locale.ROOT);
-            if (ServerBrowserFabClient.getInstance().getSettings().getBlacklistedServers().contains(address)) {
+            if (CommonClient.getInstance().getSettings().getBlacklistedServers().contains(address)) {
                 this.valid = false;
             }
 

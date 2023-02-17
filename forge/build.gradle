@@ -36,8 +36,8 @@ configurations {
 }
 
 mixin {
-    // put mixin sets in here
-    // and configs
+    add sourceSets.main, "ServerBrowser-refmap.json"
+    config "serverbrowser.mixins.json"
 }
 
 sourceSets {
@@ -62,7 +62,7 @@ minecraft {
         client {
             workingDirectory project.file('run')
             property 'legacyClassPath', '{minecraft_classpath}'
-            arg "-mixin.config=bozoiD.mixins.json"
+            arg "-mixin.config=serverbrowser.mixins.json"
             // Recommended logging data for a userdev environment
             //property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             // Recommended logging level for the console //property 'forge.logging.console.level', 'debug'
@@ -126,14 +126,14 @@ artifacts {
 jar {
     manifest {
         attributes([
-                "Specification-Title": "idbozoiD",
+                "Specification-Title": "ServerBrowser",
                 "Specification-Vendor": "epherical.com",
                 "Specification-Version": "1",
                 "Implementation-Title": "${modBaseArchiveName}",
                 "Implementation-Version": "${modVersion}",
                 "Implementation-Vendor" :"epherical.com",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                "MixinConfigs": "bozoiD.mixins.json"
+                "MixinConfigs": "serverbrowser.mixins.json"
         ])
     }
 }

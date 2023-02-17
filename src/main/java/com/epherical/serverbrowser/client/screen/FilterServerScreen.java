@@ -1,7 +1,7 @@
 package com.epherical.serverbrowser.client.screen;
 
+import com.epherical.serverbrowser.client.CommonClient;
 import com.epherical.serverbrowser.client.Filter;
-import com.epherical.serverbrowser.client.ServerBrowserFabClient;
 import com.epherical.serverbrowser.client.list.TagList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -51,7 +51,7 @@ public class FilterServerScreen extends Screen {
                     filters.add(new Filter(string, active));
                 }
             }
-            ServerBrowserFabClient.getInstance().clearAndReset(filters);
+            CommonClient.getInstance().clearAndReset(filters);
             this.minecraft.setScreen(previousScreen);
         }));
 
@@ -62,7 +62,7 @@ public class FilterServerScreen extends Screen {
     public void queryTags() {
         websiteStatus = null;
         try {
-            URIBuilder builder = new URIBuilder(ServerBrowserFabClient.URL + "/api/v1/tags");
+            URIBuilder builder = new URIBuilder(CommonClient.URL + "/api/v1/tags");
             URL url = builder.build().toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -75,12 +75,12 @@ public class FilterServerScreen extends Screen {
                     JsonObject object = jsonElement.getAsJsonObject();
                     String tagName = object.get("tagName").getAsString();
                     String category = object.get("category").getAsString();
-                    if (ServerBrowserFabClient.getInstance().getSettings().modPackFilter.length() > 0 && category.equals("Modpack")) {
+                    if (CommonClient.getInstance().getSettings().modPackFilter.length() > 0 && category.equals("Modpack")) {
                         continue;
                     }
                     List<Filter> filterList = new ArrayList<>();
                     filterList.add(new Filter(tagName));
-                    ServerBrowserFabClient.getInstance().mergeFilters(filterList);
+                    CommonClient.getInstance().mergeFilters(filterList);
                 }
             }
             connection.disconnect();
