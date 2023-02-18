@@ -14,6 +14,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import org.apache.http.client.utils.URIBuilder;
 
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class FilterServerScreen extends Screen {
     protected TagList list;
 
     protected FilterServerScreen(Screen previousScreen) {
-        super(Component.literal("Filter Servers"));
+        super(new TextComponent("Filter Servers"));
         this.previousScreen = previousScreen;
     }
 
@@ -85,7 +86,7 @@ public class FilterServerScreen extends Screen {
             }
             connection.disconnect();
         } catch (URISyntaxException | IOException e) {
-            websiteStatus = Component.literal("Website could not be reached at the moment");
+            websiteStatus = new TextComponent("Website could not be reached at the moment");
         }
     }
 

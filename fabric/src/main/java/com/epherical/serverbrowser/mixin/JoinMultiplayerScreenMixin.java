@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,17 +30,9 @@ public class JoinMultiplayerScreenMixin extends Screen {
 
     @Inject(method = "init", at = @At(value = "TAIL"))
     public void serverBrowserAddBrowserButton(CallbackInfo ci) {
-        this.addRenderableWidget(new Button(3, 3, 120, 20, Component.translatable("Server Browser"), button -> {
+        this.addRenderableWidget(new Button(3, 3, 120, 20, new TranslatableComponent("Server Browser"), button -> {
             minecraft.setScreen(new ServerBrowserScreen(this));
         }));
-    }
-
-    @Inject(method = "onSelectedChange", at = @At("TAIL"))
-    public void serverBrowserPreventChange(CallbackInfo ci) {
-        if (this.serverSelectionList.getSelected() instanceof OfficialServerListing.OfficialEntry) {
-            this.editButton.active = false;
-            this.deleteButton.active = false;
-        }
     }
 
     @Inject(method = "onSelectedChange", at = @At("TAIL"))

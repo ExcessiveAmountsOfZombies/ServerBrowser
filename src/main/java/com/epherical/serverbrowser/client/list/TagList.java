@@ -11,6 +11,7 @@ import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -50,7 +51,7 @@ public class TagList extends ContainerObjectSelectionList<TagList.Entry> {
             this.checkboxes = new ArrayList<>();
             for (Filter checkbox : checkboxes) {
                 int width = minecraft.font.width(checkbox.getTagName()) + 20;
-                this.checkboxes.add(new Checkbox(0, 0, width + 5, 20, Component.literal(checkbox.getTagName()), checkbox.isActive()));
+                this.checkboxes.add(new Checkbox(0, 0, width + 5, 20, new TextComponent(checkbox.getTagName()), checkbox.isActive()));
             }
         }
 
@@ -66,7 +67,7 @@ public class TagList extends ContainerObjectSelectionList<TagList.Entry> {
                     widest = itemWidth;
                 }
                 if (increment == 1) {
-                    checkbox.setX((left + widest));
+                    checkbox.x = ((left + widest));
                 }
                 checkbox.render(poseStack, mouseX, mouseY, partialTick);
                 increment++;

@@ -10,7 +10,7 @@ public class CommonClient {
 
     private static CommonClient client;
 
-    public static String URL = "https://minecraft.multiplayerservers.net";
+    public static String URL = "http://localhost:8080";
 
     private Set<Filter> filters;
     private ConfigSettings settings;

@@ -18,6 +18,7 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -25,6 +26,8 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import org.apache.commons.lang3.Validate;
@@ -50,11 +53,11 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
     private static final ResourceLocation ICON_MISSING = new ResourceLocation("textures/misc/unknown_server.png");
     private static final ResourceLocation ICON_OVERLAY_LOCATION = new ResourceLocation("textures/gui/server_selection.png");
 
-    private static final Component CANT_RESOLVE_TEXT = Component.translatable("multiplayer.status.cannot_resolve").withStyle(ChatFormatting.DARK_RED);
-    private static final Component CANT_CONNECT_TEXT = Component.translatable("multiplayer.status.cannot_connect").withStyle(ChatFormatting.DARK_RED);
-    private static final Component INCOMPATIBLE_TOOLTIP = Component.translatable("multiplayer.status.incompatible");
-    private static final Component NO_CONNECTION_TOOLTIP = Component.translatable("multiplayer.status.no_connection");
-    private static final Component PINGING_TOOLTIP = Component.translatable("multiplayer.status.pinging");
+    private static final Component CANT_RESOLVE_TEXT = new TranslatableComponent("multiplayer.status.cannot_resolve").withStyle(ChatFormatting.DARK_RED);
+    private static final Component CANT_CONNECT_TEXT = new TranslatableComponent("multiplayer.status.cannot_connect").withStyle(ChatFormatting.DARK_RED);
+    private static final Component INCOMPATIBLE_TOOLTIP = new TranslatableComponent("multiplayer.status.incompatible");
+    private static final Component NO_CONNECTION_TOOLTIP = new TranslatableComponent("multiplayer.status.no_connection");
+    private static final Component PINGING_TOOLTIP = new TranslatableComponent("multiplayer.status.pinging");
 
 
     private final ServerBrowserScreen screen;
@@ -144,7 +147,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
                 this.valid = false;
             }
 
-            this.description = Component.literal(object.get("description").getAsString());
+            this.description = new TextComponent(object.get("description").getAsString());
             List<String> tags = new ArrayList<>();
             JsonArray array = object.getAsJsonArray("tags");
             for (JsonElement tag : array) {
@@ -193,7 +196,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
 
         @Override
         public Component getNarration() {
-            return Component.literal("howdy partner");
+            return new TextComponent("howdy partner");
         }
 
         @Override
@@ -201,8 +204,8 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             if (!this.serverData.pinged) {
                 this.serverData.pinged = true;
                 this.serverData.ping = -2L;
-                this.serverData.motd = CommonComponents.EMPTY;
-                this.serverData.status = CommonComponents.EMPTY;
+                this.serverData.motd = TextComponent.EMPTY;
+                this.serverData.status = TextComponent.EMPTY;
                 THREAD_POOL.submit(() -> {
                     try {
                         this.screen.getPinger().pingServer(this.serverData, () -> {
@@ -258,7 +261,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
                     component2 = NO_CONNECTION_TOOLTIP;
                     list2 = Collections.emptyList();
                 } else {
-                    component2 = Component.translatable("multiplayer.status.ping", this.serverData.ping);
+                    component2 = new TranslatableComponent("multiplayer.status.ping", this.serverData.ping);
                     list2 = this.serverData.playerList;
                 }
             } else {
@@ -295,7 +298,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             int m = mouseX - left;
             int n = mouseY - top;
 
-            if (this.minecraft.options.touchscreen().get() || isMouseOver) {
+            if (this.minecraft.options.touchscreen || isMouseOver) {
                 RenderSystem.setShaderTexture(0, ICON_OVERLAY_LOCATION);
                 GuiComponent.fill(poseStack, left, top, left + 32, top + 32, -1601138544);
                 RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -323,7 +326,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
                         currentLength += minecraft.font.width(tag);
                     }
                     condensedTags.add(condenser.toString());
-                    List<Component> components = condensedTags.stream().map(Component::literal).collect(Collectors.toList());
+                    List<Component> components = condensedTags.stream().map(TextComponent::new).collect(Collectors.toList());
                     screen.setToolTip(components);
                     // TODO; background hovering here
                     /*if (o < 32 && o > 16) {
