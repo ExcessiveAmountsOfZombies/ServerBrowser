@@ -7,32 +7,28 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.logging.LogUtils;
-import net.minecraft.ChatFormatting;
-import net.minecraft.DefaultUncaughtExceptionHandler;
-import net.minecraft.SharedConstants;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.components.ObjectSelectionList;
-import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
-import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.client.renderer.texture.NativeImage;
+import net.minecraft.util.DefaultUncaughtExceptionHandler;
+import net.minecraft.util.IReorderingProcessor;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SharedConstants;
+import net.minecraft.util.Util;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import org.apache.commons.lang3.Validate;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -44,20 +40,20 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
-public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Entry> {
+public class ServerBrowserList extends ExtendedList<ServerBrowserList.Entry> {
 
-    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final ThreadPoolExecutor THREAD_POOL = new ScheduledThreadPoolExecutor(5,
             (new ThreadFactoryBuilder()).setNameFormat("ServerBrowser Pinger #%d")
                     .setDaemon(true).setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(LOGGER)).build());
     private static final ResourceLocation ICON_MISSING = new ResourceLocation("textures/misc/unknown_server.png");
     private static final ResourceLocation ICON_OVERLAY_LOCATION = new ResourceLocation("textures/gui/server_selection.png");
 
-    private static final Component CANT_RESOLVE_TEXT = new TranslatableComponent("multiplayer.status.cannot_resolve").withStyle(ChatFormatting.DARK_RED);
-    private static final Component CANT_CONNECT_TEXT = new TranslatableComponent("multiplayer.status.cannot_connect").withStyle(ChatFormatting.DARK_RED);
-    private static final Component INCOMPATIBLE_TOOLTIP = new TranslatableComponent("multiplayer.status.incompatible");
-    private static final Component NO_CONNECTION_TOOLTIP = new TranslatableComponent("multiplayer.status.no_connection");
-    private static final Component PINGING_TOOLTIP = new TranslatableComponent("multiplayer.status.pinging");
+    private static final ITextComponent CANT_RESOLVE_TEXT = new TranslationTextComponent("multiplayer.status.cannot_resolve").withStyle(TextFormatting.DARK_RED);
+    private static final ITextComponent CANT_CONNECT_TEXT = new TranslationTextComponent("multiplayer.status.cannot_connect").withStyle(TextFormatting.DARK_RED);
+    private static final ITextComponent INCOMPATIBLE_TOOLTIP = new TranslationTextComponent("multiplayer.status.incompatible");
+    private static final ITextComponent NO_CONNECTION_TOOLTIP = new TranslationTextComponent("multiplayer.status.no_connection");
+    private static final ITextComponent PINGING_TOOLTIP = new TranslationTextComponent("multiplayer.status.pinging");
 
 
     private final ServerBrowserScreen screen;
@@ -107,7 +103,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
         return super.getRowWidth() + 85;
     }
 
-    public abstract static class Entry extends ObjectSelectionList.Entry<Entry> {
+    public abstract static class Entry extends ExtendedList.AbstractListEntry<Entry> {
     }
 
     public class BrowsedEntry extends Entry {
@@ -117,7 +113,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
         private final String serverName;
         private final String ipAddress;
         private final int port;
-        private final Component description;
+        private final ITextComponent description;
         private final List<String> tags;
         private final int rank;
         private final int bgColor;
@@ -147,7 +143,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
                 this.valid = false;
             }
 
-            this.description = new TextComponent(object.get("description").getAsString());
+            this.description = new StringTextComponent(object.get("description").getAsString());
             List<String> tags = new ArrayList<>();
             JsonArray array = object.getAsJsonArray("tags");
             for (JsonElement tag : array) {
@@ -166,10 +162,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             }
 
             this.iconLocation = new ResourceLocation("servers/" + Hashing.sha1().hashUnencodedChars(ip) + "/icon");
-            AbstractTexture abstractTexture = minecraft.getTextureManager().getTexture(this.iconLocation, MissingTextureAtlasSprite.getTexture());
-            if (abstractTexture != MissingTextureAtlasSprite.getTexture() && abstractTexture instanceof DynamicTexture) {
-                this.icon = (DynamicTexture) abstractTexture;
-            }
+            this.icon = (DynamicTexture) this.minecraft.getTextureManager().getTexture(this.iconLocation);
             this.serverData = new ServerData(serverName, ipAddress, false);
         }
 
@@ -195,17 +188,12 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
         }
 
         @Override
-        public Component getNarration() {
-            return new TextComponent("howdy partner");
-        }
-
-        @Override
-        public void render(PoseStack poseStack, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTick) {
+        public void render(MatrixStack poseStack, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTick) {
             if (!this.serverData.pinged) {
                 this.serverData.pinged = true;
                 this.serverData.ping = -2L;
-                this.serverData.motd = TextComponent.EMPTY;
-                this.serverData.status = TextComponent.EMPTY;
+                this.serverData.motd = StringTextComponent.EMPTY;
+                this.serverData.status = StringTextComponent.EMPTY;
                 THREAD_POOL.submit(() -> {
                     try {
                         this.screen.getPinger().pingServer(this.serverData, () -> {
@@ -225,19 +213,19 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
 
             boolean bl = this.serverData.protocol != SharedConstants.getCurrentVersion().getProtocolVersion();
             this.minecraft.font.draw(poseStack, this.serverData.name, (float) (left + 32 + 3), (float) (top + 1), 16777215);
-            List<FormattedCharSequence> list = this.minecraft.font.split(this.serverData.motd, width - 32 - 2);
+            List<IReorderingProcessor> list = this.minecraft.font.split(this.serverData.motd, width - 32 - 2);
 
             for (int i = 0; i < Math.min(list.size(), 2); ++i) {
                 this.minecraft.font.draw(poseStack, list.get(i), (left + 32 + 3), (float) (top + 12 + 9 * i), 8421504);
             }
 
-            Component component = bl ? this.serverData.version.copy().withStyle(ChatFormatting.RED) : this.serverData.status;
-            int textWidth = this.minecraft.font.width(component);
-            this.minecraft.font.draw(poseStack, component, (float) (left + width - textWidth - 15 - 2), (float) (top + 1), 8421504);
+            ITextComponent ITextComponent = bl ? this.serverData.version.copy().withStyle(TextFormatting.RED) : this.serverData.status;
+            int textWidth = this.minecraft.font.width(ITextComponent);
+            this.minecraft.font.draw(poseStack, ITextComponent, (float) (left + width - textWidth - 15 - 2), (float) (top + 1), 8421504);
             int k = 0;
             int latency;
-            List<Component> list2;
-            Component component2;
+            List<ITextComponent> list2;
+            ITextComponent component2;
             if (bl) {
                 latency = 5;
                 component2 = INCOMPATIBLE_TOOLTIP;
@@ -261,7 +249,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
                     component2 = NO_CONNECTION_TOOLTIP;
                     list2 = Collections.emptyList();
                 } else {
-                    component2 = new TranslatableComponent("multiplayer.status.ping", this.serverData.ping);
+                    component2 = new TranslationTextComponent("multiplayer.status.ping", this.serverData.ping);
                     list2 = this.serverData.playerList;
                 }
             } else {
@@ -275,10 +263,9 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
                 list2 = Collections.emptyList();
             }
 
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            RenderSystem.setShaderTexture(0, GuiComponent.GUI_ICONS_LOCATION);
-            GuiComponent.blit(poseStack, left + width - 15, top, (float) (k * 10), (float) (176 + latency * 8), 10, 8, 256, 256);
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            this.minecraft.getTextureManager().bind(AbstractGui.GUI_ICONS_LOCATION);
+            AbstractGui.blit(poseStack, left + width - 15, top, (float) (k * 10), (float) (176 + latency * 8), 10, 8, 256, 256);
             String string = this.serverData.getIconB64();
             if (!Objects.equals(string, this.lastIconB64)) {
                 if (this.uploadServerIcon(string)) {
@@ -299,10 +286,9 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             int n = mouseY - top;
 
             if (this.minecraft.options.touchscreen || isMouseOver) {
-                RenderSystem.setShaderTexture(0, ICON_OVERLAY_LOCATION);
-                GuiComponent.fill(poseStack, left, top, left + 32, top + 32, -1601138544);
-                RenderSystem.setShader(GameRenderer::getPositionTexShader);
-                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+                this.minecraft.getTextureManager().bind(ICON_OVERLAY_LOCATION);
+                AbstractGui.fill(poseStack, left, top, left + 32, top + 32, -1601138544);
+                RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
                 int o = mouseX - left;
                 if (this.canJoin()) {
                     int currentLength = 0;
@@ -326,7 +312,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
                         currentLength += minecraft.font.width(tag);
                     }
                     condensedTags.add(condenser.toString());
-                    List<Component> components = condensedTags.stream().map(TextComponent::new).collect(Collectors.toList());
+                    List<ITextComponent> components = condensedTags.stream().map(StringTextComponent::new).collect(Collectors.toList());
                     screen.setToolTip(components);
                     // TODO; background hovering here
                     /*if (o < 32 && o > 16) {
@@ -349,10 +335,10 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             return valid;
         }
 
-        protected void drawIcon(PoseStack poseStack, int x, int y, ResourceLocation textureLocation) {
-            RenderSystem.setShaderTexture(0, textureLocation);
+        protected void drawIcon(MatrixStack poseStack, int x, int y, ResourceLocation textureLocation) {
+            this.minecraft.getTextureManager().bind(textureLocation);
             RenderSystem.enableBlend();
-            GuiComponent.blit(poseStack, x, y, 0.0F, 0.0F, 32, 32, 32, 32);
+            AbstractGui.blit(poseStack, x, y, 0.0F, 0.0F, 32, 32, 32, 32);
             RenderSystem.disableBlend();
         }
 

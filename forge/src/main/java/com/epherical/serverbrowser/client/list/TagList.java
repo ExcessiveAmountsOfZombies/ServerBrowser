@@ -4,21 +4,20 @@ import com.epherical.serverbrowser.client.CommonClient;
 import com.epherical.serverbrowser.client.Filter;
 import com.epherical.serverbrowser.client.screen.FilterServerScreen;
 import com.google.common.collect.Iterables;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Checkbox;
-import net.minecraft.client.gui.components.ContainerObjectSelectionList;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarratableEntry;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.gui.widget.button.CheckboxButton;
+import net.minecraft.client.gui.widget.list.AbstractOptionList;
+import net.minecraft.client.gui.widget.list.ExtendedList;
+import net.minecraft.util.text.StringTextComponent;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TagList extends ContainerObjectSelectionList<TagList.Entry> {
+public class TagList extends ExtendedList<TagList.Entry> {
 
 
     public TagList(FilterServerScreen screen, Minecraft minecraft, int i, int j, int k, int l, int m) {
@@ -45,21 +44,21 @@ public class TagList extends ContainerObjectSelectionList<TagList.Entry> {
 
         private static int widest = 0;
 
-        private final List<Checkbox> checkboxes;
+        private final List<CheckboxButton> checkboxes;
 
         public TagEntry(Filter... checkboxes) {
             this.checkboxes = new ArrayList<>();
             for (Filter checkbox : checkboxes) {
                 int width = minecraft.font.width(checkbox.getTagName()) + 20;
-                this.checkboxes.add(new Checkbox(0, 0, width + 5, 20, new TextComponent(checkbox.getTagName()), checkbox.isActive()));
+                this.checkboxes.add(new CheckboxButton(0, 0, width + 5, 20, new StringTextComponent(checkbox.getTagName()), checkbox.isActive()));
             }
         }
 
         @Override
-        public void render(PoseStack poseStack, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTick) {
+        public void render(MatrixStack poseStack, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTick) {
             int itemWidth = 0;
             int increment = 0;
-            for (Checkbox checkbox : checkboxes) {
+            for (CheckboxButton checkbox : checkboxes) {
                 checkbox.x = (left + itemWidth);
                 checkbox.y = (top);
                 itemWidth += checkbox.getWidth();
@@ -76,17 +75,12 @@ public class TagList extends ContainerObjectSelectionList<TagList.Entry> {
         }
 
         @Override
-        public List<? extends NarratableEntry> narratables() {
-            return checkboxes;
-        }
-
-        @Override
-        public List<? extends GuiEventListener> children() {
+        public List<? extends IGuiEventListener> children() {
             return checkboxes;
         }
     }
 
-    public abstract static class Entry extends ContainerObjectSelectionList.Entry<Entry> {
+    public abstract static class Entry extends AbstractOptionList.Entry<Entry> {
 
     }
 

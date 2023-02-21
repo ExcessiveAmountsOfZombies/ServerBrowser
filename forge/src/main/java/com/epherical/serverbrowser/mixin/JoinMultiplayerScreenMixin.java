@@ -2,35 +2,38 @@ package com.epherical.serverbrowser.mixin;
 
 import com.epherical.serverbrowser.client.OfficialServerListing;
 import com.epherical.serverbrowser.client.screen.ServerBrowserScreen;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
-import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.client.gui.screen.MultiplayerScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ServerSelectionList;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(JoinMultiplayerScreen.class)
+@Mixin(MultiplayerScreen.class)
 public class JoinMultiplayerScreenMixin extends Screen {
 
 
-    @Shadow protected ServerSelectionList serverSelectionList;
+    @Shadow
+    protected ServerSelectionList serverSelectionList;
 
-    @Shadow private Button editButton;
+    @Shadow
+    private Button editButton;
 
-    @Shadow private Button deleteButton;
+    @Shadow
+    private Button deleteButton;
 
-    protected JoinMultiplayerScreenMixin(Component component) {
-        super(component);
+    protected JoinMultiplayerScreenMixin(ITextComponent pTitle) {
+        super(pTitle);
     }
 
     @Inject(method = "init", at = @At(value = "TAIL"))
     public void serverBrowserAddBrowserButton(CallbackInfo ci) {
-        this.addRenderableWidget(new Button(3, 3, 120, 20, new TranslatableComponent("Server Browser"), button -> {
+        this.addButton(new Button(3, 3, 120, 20, new TranslationTextComponent("Server Browser"), button -> {
             minecraft.setScreen(new ServerBrowserScreen(this));
         }));
     }

@@ -1,7 +1,6 @@
 package com.epherical.serverbrowser;
 
 import com.epherical.serverbrowser.client.ServerBrowserForgeClient;
-import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.DistExecutor;

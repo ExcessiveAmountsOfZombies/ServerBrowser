@@ -5,20 +5,20 @@ import com.epherical.serverbrowser.client.Filter;
 import com.epherical.serverbrowser.client.list.ServerBrowserList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.Util;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.ConfirmLinkScreen;
-import net.minecraft.client.gui.screens.ConnectScreen;
-import net.minecraft.client.gui.screens.Screen;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.client.gui.DialogTexts;
+import net.minecraft.client.gui.screen.ConfirmOpenLinkScreen;
+import net.minecraft.client.gui.screen.ConfirmScreen;
+import net.minecraft.client.gui.screen.ConnectingScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
-import net.minecraft.client.multiplayer.ServerStatusPinger;
-import net.minecraft.client.multiplayer.resolver.ServerAddress;
-import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.client.network.ServerPinger;
+import net.minecraft.util.Util;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import org.apache.http.client.utils.URIBuilder;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,15 +31,15 @@ import java.util.List;
 public class ServerBrowserScreen extends Screen {
 
 
-    private final ServerStatusPinger pinger = new ServerStatusPinger();
+    private final ServerPinger pinger = new ServerPinger();
     protected ServerBrowserList list;
 
     private Button joinButton;
     private Button favoriteButton;
 
     @Nullable
-    private List<Component> toolTip;
-    private Component websiteStatus;
+    private List<ITextComponent> toolTip;
+    private ITextComponent websiteStatus;
 
     private Screen previousScreen;
 
@@ -47,9 +47,10 @@ public class ServerBrowserScreen extends Screen {
 
     private int page = 1;
 
-    public ServerBrowserScreen(Screen previousScreen) {
-        super(Component.nullToEmpty(""));
-        this.previousScreen = previousScreen;
+    public ServerBrowserScreen(Object previousScreen) {
+        super(ITextComponent.nullToEmpty(""));
+        // YIKES
+        this.previousScreen = (Screen) previousScreen;
     }
 
 
@@ -60,15 +61,15 @@ public class ServerBrowserScreen extends Screen {
         list.queryServers();
 
         if (list.getEntries().size() >= 20) {
-            Button nextButton = this.addRenderableWidget(new Button(this.width - 110, 12, 60, 20, new TranslatableComponent("Next: " + (page + 1)), button -> {
+            Button nextButton = this.addButton(new Button(this.width - 110, 12, 60, 20, new TranslationTextComponent("Next: " + (page + 1)), button -> {
                 if (list.getEntries().size() >= 20) {
                     page++;
                     queryServers();
                     list.queryServers();
-                    button.setMessage(new TranslatableComponent("Next: " + (page + 1)));
+                    button.setMessage(new TranslationTextComponent("Next: " + (page + 1)));
                 }
             }));
-            this.addRenderableWidget(new Button(this.width - 140, 12, 30, 20, new TranslatableComponent("Prev"), button -> {
+            this.addButton(new Button(this.width - 140, 12, 30, 20, new TranslationTextComponent("Prev"), button -> {
                 if (page <= 1) {
                     page = 1;
                 } else {
@@ -76,28 +77,28 @@ public class ServerBrowserScreen extends Screen {
                     queryServers();
                     list.queryServers();
                 }
-                nextButton.setMessage(new TranslatableComponent("Next: " + (page + 1)));
+                nextButton.setMessage(new TranslationTextComponent("Next: " + (page + 1)));
             }));
         }
 
-        this.addRenderableWidget(new Button(this.width / 2 - 50, 3, 100, 20, new TextComponent("Register Server"), button -> {
-            this.minecraft.setScreen(new ConfirmLinkScreen((bl) -> {
+        this.addButton(new Button(this.width / 2 - 50, 3, 100, 20, new TranslationTextComponent("Register Server"), button -> {
+            this.minecraft.setScreen(new ConfirmOpenLinkScreen((bl) -> {
                 if (bl) {
                     Util.getPlatform().openUri("https://minecraft.multiplayerservers.net");
                 }
                 this.minecraft.setScreen(this);
             }, "https://minecraft.multiplayerservers.net", true));
         }));
-        this.joinButton = this.addRenderableWidget(new Button(this.width / 2 - 154, this.height - 52, 100, 20, new TranslatableComponent("selectServer.select"), (button) -> {
+        this.joinButton = this.addButton(new Button(this.width / 2 - 154, this.height - 52, 100, 20, new TranslationTextComponent("selectServer.select"), (button) -> {
             this.joinSelectedServer();
         }));
-        this.addRenderableWidget(new Button(this.width / 2 - 50, this.height - 52, 100, 20, new TranslatableComponent("Filter Servers"), (button) -> {
+        this.addButton(new Button(this.width / 2 - 50, this.height - 52, 100, 20, new TranslationTextComponent("Filter Servers"), (button) -> {
             this.minecraft.setScreen(new FilterServerScreen(this));
         }));
-        this.addRenderableWidget(new Button(this.width / 2 + 54, this.height - 52, 100, 20, new TranslatableComponent("History (WIP)"), (button) -> {
+        this.addButton(new Button(this.width / 2 + 54, this.height - 52, 100, 20, new TranslationTextComponent("History (WIP)"), (button) -> {
             // todo; store 20 servers last joined from this screen.
         }));
-        this.favoriteButton = this.addRenderableWidget(new Button(this.width / 2 - 154, this.height - 28, 70, 20, new TranslatableComponent("Favorite"), (button) -> {
+        this.favoriteButton = this.addButton(new Button(this.width / 2 - 154, this.height - 28, 70, 20, new TranslationTextComponent("Favorite"), (button) -> {
             ServerList serverList = new ServerList(this.minecraft);
             ServerBrowserList.Entry entry = this.list.getSelected();
             if (entry instanceof ServerBrowserList.BrowsedEntry browsedEntry) {
@@ -106,10 +107,10 @@ public class ServerBrowserScreen extends Screen {
                 serverList.save();
             }
         }));
-        this.addRenderableWidget(new Button(this.width / 2 - 80, this.height - 28, 156, 20, new TranslatableComponent("selectServer.refresh"), (button) -> {
+        this.addButton(new Button(this.width / 2 - 80, this.height - 28, 156, 20, new TranslationTextComponent("selectServer.refresh"), (button) -> {
             this.refreshServerList();
         }));
-        this.addRenderableWidget(new Button(this.width / 2 + 4 + 76, this.height - 28, 75, 20, CommonComponents.GUI_CANCEL, (button) -> {
+        this.addButton(new Button(this.width / 2 + 4 + 76, this.height - 28, 75, 20, DialogTexts.GUI_CANCEL, (button) -> {
             this.minecraft.setScreen(null);
         }));
 
@@ -118,7 +119,7 @@ public class ServerBrowserScreen extends Screen {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    public void render(MatrixStack poseStack, int mouseX, int mouseY, float partialTick) {
         toolTip = null;
         this.renderBackground(poseStack);
 
@@ -153,11 +154,11 @@ public class ServerBrowserScreen extends Screen {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 byte[] bytes = connection.getInputStream().readAllBytes();
                 String string = new String(bytes);
-                servers = JsonParser.parseString(string);
+                servers = new JsonParser().parse(string);
             }
             connection.disconnect();
         } catch (IOException | URISyntaxException ignored) {
-            websiteStatus = new TextComponent("Website could not be reached at the moment");
+            websiteStatus = new StringTextComponent("Website could not be reached at the moment");
         }
     }
 
@@ -184,18 +185,18 @@ public class ServerBrowserScreen extends Screen {
     }
 
     private void join(ServerData server) {
-        ConnectScreen.startConnecting(this, this.minecraft, ServerAddress.parseString(server.ip), server);
+        this.minecraft.setScreen(new ConnectingScreen(this, this.minecraft, server));
     }
 
     private void refreshServerList() {
         list.refreshServers();
     }
 
-    public ServerStatusPinger getPinger() {
+    public ServerPinger getPinger() {
         return pinger;
     }
 
-    public void setToolTip(List<Component> toolTip) {
+    public void setToolTip(List<ITextComponent> toolTip) {
         this.toolTip = toolTip;
     }
 }
