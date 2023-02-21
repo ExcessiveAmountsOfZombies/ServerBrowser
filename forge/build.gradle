@@ -26,7 +26,12 @@ group = project.mavenGroup
 archivesBaseName = modBaseArchiveName + "-" + minecraftVersion + "-FORGE"
 
 repositories {
-
+    maven {
+        url "https://www.cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 configurations {
@@ -110,6 +115,11 @@ dependencies {
     implementation(rootProject)
     shade(rootProject)
     annotationProcessor "org.spongepowered:mixin:${mixinVersion}:processor"
+
+
+    compileOnly(fg.deobf("curse.maven:project-${project.forgeFancyMenuID}:${project.forgeFancyMenuFile}"))
+    compileOnly(fg.deobf("curse.maven:project-${project.forgeKonkreteID}:${project.forgeKonkreteFile}"))
+
 }
 
 shadowJar {
