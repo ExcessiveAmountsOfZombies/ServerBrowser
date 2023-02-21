@@ -3,6 +3,7 @@
   "minVersion": "0.8",
   "package": "com.epherical.serverbrowser.mixin",
   "compatibilityLevel": "JAVA_17",
+  "refmap": "ServerBrowser-refmap.json",
   "mixins": [
     "ServerSelectionMixin"
   ],

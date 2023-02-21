@@ -30,6 +30,6 @@ Adds a server browser in game to find MC servers to play on.
 [[dependencies.serverbrowser]]
    modId="minecraft"
    mandatory=true
-   versionRange="[1.18.2]"
+   versionRange="[1.18,1.18.2]"
    ordering="NONE"
    side="SERVER"
