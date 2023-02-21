@@ -10,7 +10,7 @@ public class CommonClient {
 
     private static CommonClient client;
 
-    public static String URL = "http://localhost:8080";
+    public static String URL = "https://minecraft.multiplayerservers.net";
 
     private Set<Filter> filters;
     private ConfigSettings settings;
@@ -18,9 +18,6 @@ public class CommonClient {
     public CommonClient() {
         client = this;
         filters = new LinkedHashSet<>();
-        if (settings != null && settings.modPackFilter.length() > 0)  {
-            filters.add(new Filter(settings.modPackFilter, true));
-        }
     }
 
     public void mergeFilters(List<Filter> filter) {
@@ -35,6 +32,9 @@ public class CommonClient {
 
     public void setSettings(ConfigSettings settings) {
         this.settings = settings;
+        if (settings.modPackFilter.length() > 0)  {
+            filters.add(new Filter(settings.modPackFilter, true));
+        }
     }
 
     public void setFilters(Set<Filter> filters) {
