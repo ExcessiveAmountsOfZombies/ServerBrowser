@@ -11,7 +11,7 @@ public class ServerBrowserForgeClient {
 
     public static void initClient() {
         Config config = new Config();
-        CommonClient commonClient = new CommonClient();
+        CommonClient commonClient = new CommonClient(config);
         commonClient.setSettings(config.loadConfig());
     }
 
