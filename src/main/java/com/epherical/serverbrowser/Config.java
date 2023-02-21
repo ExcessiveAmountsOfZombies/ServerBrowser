@@ -13,9 +13,10 @@ public class Config {
 
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
+    private final Path path = CommonPlatform.platform.getRootConfigPath().resolve("serverbrowser.json");
+
     public ConfigSettings loadConfig() {
         ConfigSettings settings = null;
-        Path path = CommonPlatform.platform.getRootConfigPath().resolve("serverbrowser.json");
 
         if (Files.exists(path)) {
             try {
@@ -35,12 +36,16 @@ public class Config {
         }
 
         try {
-            Files.writeString(path, GSON.toJson(settings), StandardCharsets.UTF_8, StandardOpenOption.CREATE);
+            saveFile(settings);
             return settings;
         } catch (IOException e) {
             e.printStackTrace();
         }
         return settings;
+    }
+
+    public void saveFile(ConfigSettings settings) throws IOException {
+        Files.writeString(path, GSON.toJson(settings), StandardCharsets.UTF_8, StandardOpenOption.CREATE);
     }
 
 }

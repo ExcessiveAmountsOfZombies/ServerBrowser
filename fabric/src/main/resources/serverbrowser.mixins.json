@@ -7,7 +7,8 @@
     "ServerSelectionMixin"
   ],
   "client": [
-    "JoinMultiplayerScreenMixin"
+    "JoinMultiplayerScreenMixin",
+    "TitleScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
