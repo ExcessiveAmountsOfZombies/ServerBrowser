@@ -55,6 +55,9 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.fabricLoaderVersion}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabricAPIVersion}"
 
+    modCompileOnly("curse.maven:project-${project.fabricFancyMenuID}:${project.fabricFancyMenuFile}")
+    modCompileOnly("curse.maven:project-${project.fabricKonkreteID}:${project.fabricKonkreteFile}")
+
     shade(rootProject)
     compileOnly(rootProject)
     implementation(rootProject)
