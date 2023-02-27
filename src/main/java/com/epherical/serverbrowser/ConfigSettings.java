@@ -7,7 +7,7 @@ import java.util.List;
 
 public class ConfigSettings {
 
-    public boolean serverBrowserNotification = true;
+    public boolean serverBrowserNotification = false;
 
     public String modPackFilter = "";
     public List<OfficialServer> officialServers = new ArrayList<>();
