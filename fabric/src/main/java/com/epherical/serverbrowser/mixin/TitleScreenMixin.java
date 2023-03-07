@@ -45,8 +45,8 @@ public abstract class TitleScreenMixin extends Screen implements ScreenButtonGra
 
     @Inject(method = "render", at = @At("TAIL"))
     public void serverBrowser$renderOutline(PoseStack poseStack, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
-        int yPos = serverBrowser$grabbedMultiplayerButton.y;
-        int xPos = serverBrowser$grabbedMultiplayerButton.x;
+        int yPos = serverBrowser$grabbedMultiplayerButton.getY();
+        int xPos = serverBrowser$grabbedMultiplayerButton.getX();
 
         if (CommonClient.displayCircle()) {
             if (serverBrowser$time < 20) {

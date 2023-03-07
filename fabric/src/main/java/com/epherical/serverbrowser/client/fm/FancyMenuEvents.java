@@ -26,8 +26,8 @@ public class FancyMenuEvents {
         if (screen instanceof ScreenButtonGrabber title) {
             Button button = title.grabbedButton();
             if (button.equals(event.getWidget())) {
-                int yPos = button.y;
-                int xPos = button.x;
+                int yPos = button.getY();
+                int xPos = button.getX();
 
                 if (CommonClient.displayCircle()) {
                     if (time < 20) {

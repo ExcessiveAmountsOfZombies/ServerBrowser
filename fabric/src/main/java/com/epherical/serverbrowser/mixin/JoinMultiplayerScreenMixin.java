@@ -61,8 +61,8 @@ public class JoinMultiplayerScreenMixin extends Screen implements ScreenButtonGr
 
     @Inject(method = "render", at = @At("TAIL"))
     public void serverBrowser$modifyRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
-        int yPos = serverBrowser$button.y;
-        int xPos = serverBrowser$button.x;
+        int yPos = serverBrowser$button.getY();
+        int xPos = serverBrowser$button.getX();
 
         if (CommonClient.displayCircle()) {
             if (serverBrowser$time < 20) {
