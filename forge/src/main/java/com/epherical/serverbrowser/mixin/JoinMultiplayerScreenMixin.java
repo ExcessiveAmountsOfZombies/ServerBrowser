@@ -4,6 +4,7 @@ import com.epherical.serverbrowser.client.CommonClient;
 import com.epherical.serverbrowser.client.OfficialServerListing;
 import com.epherical.serverbrowser.client.ScreenButtonGrabber;
 import com.epherical.serverbrowser.client.screen.ServerBrowserScreen;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.BufferUploader;
@@ -65,7 +66,7 @@ public class JoinMultiplayerScreenMixin extends Screen implements ScreenButtonGr
     }
 
     @Inject(method = "render", at = @At("TAIL"))
-    public void serverBrowser$modifyRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+    public void serverBrowser$modifyRender(MatrixStack poseStack, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         int yPos = serverBrowser$button.y;
         int xPos = serverBrowser$button.x;
 
