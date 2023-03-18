@@ -60,13 +60,6 @@ public class FancyMenuEvents {
                         double sin = Math.sin(-(j * twoPI / 360));
                         double cos = Math.cos(-(j * twoPI / 360));
 
-                /*if (j >= (progress + 90)) {
-                    bufferBuilder.vertex(centerX + (innerRad * cos), centerY + (innerRad * sin), getBlitOffset()).color(56, 56, 56, 255).endVertex();
-                    bufferBuilder.vertex(centerX + (outerRad * cos), centerY + (outerRad * sin), getBlitOffset()).color(56, 56, 56, 255).endVertex();
-                } else {
-
-                }*/
-
                         bufferBuilder.vertex(centerX + (innerRad * cos), centerY + (innerRad * sin), screen.getBlitOffset()).color(color).endVertex();
                         bufferBuilder.vertex(centerX + (outerRad * cos), centerY + (outerRad * sin), screen.getBlitOffset()).color(color).endVertex();
                     }

@@ -89,7 +89,6 @@ public abstract class TitleScreenMixin extends Screen implements ScreenButtonGra
                 bufferBuilder.vertex(centerX + (innerRad * cos), centerY + (innerRad * sin), getBlitOffset()).color(serverBrowser$color).endVertex();
                 bufferBuilder.vertex(centerX + (outerRad * cos), centerY + (outerRad * sin), getBlitOffset()).color(serverBrowser$color).endVertex();
             }
-
             BufferUploader.drawWithShader(bufferBuilder.end());
 
             serverBrowser$time++;
