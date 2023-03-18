@@ -107,7 +107,8 @@ public class JoinMultiplayerScreenMixin extends Screen implements ScreenButtonGr
                 bufferBuilder.vertex(centerX + (outerRad * cos), centerY + (outerRad * sin), getBlitOffset()).color(serverBrowser$color).endVertex();
             }
 
-            BufferUploader.drawWithShader(bufferBuilder.end());
+            bufferBuilder.end();
+            BufferUploader.end(bufferBuilder);
 
             serverBrowser$time++;
         }

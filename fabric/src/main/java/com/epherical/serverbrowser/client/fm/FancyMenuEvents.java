@@ -71,7 +71,8 @@ public class FancyMenuEvents {
                         bufferBuilder.vertex(centerX + (outerRad * cos), centerY + (outerRad * sin), screen.getBlitOffset()).color(color).endVertex();
                     }
 
-                    BufferUploader.drawWithShader(bufferBuilder.end());
+                    bufferBuilder.end();
+                    BufferUploader.end(bufferBuilder);
 
                     time++;
                 }
