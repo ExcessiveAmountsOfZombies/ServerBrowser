@@ -1,5 +1,6 @@
 package com.epherical.serverbrowser.client.screen;
 
+import com.epherical.serverbrowser.ServerQuery;
 import com.epherical.serverbrowser.client.CommonClient;
 import com.epherical.serverbrowser.client.Filter;
 import com.epherical.serverbrowser.client.list.ServerBrowserList;
@@ -136,17 +137,24 @@ public class ServerBrowserScreen extends Screen {
 
     public void queryServers() {
         websiteStatus = null;
+        ServerQuery main = new ServerQuery(CommonClient.URL + "/api/v1/servers", builder -> {
+            if (page > 1) {
+                builder.addParameter("page", String.valueOf(page));
+            }
+            for (Filter filter : CommonClient.getInstance().getFilters()) {
+                if (filter.isActive()) {
+                    builder.addParameter("type", filter.getTagName());
+                }
+            }
+        }, throwable -> {
+            websiteStatus = new TextComponent("Website could not be reached at the moment");
+            return null;
+        });
+
         CompletableFuture.runAsync(() -> {
             try {
                 URIBuilder builder = new URIBuilder(CommonClient.URL + "/api/v1/servers");
-                if (page > 1) {
-                    builder.addParameter("page", String.valueOf(page));
-                }
-                for (Filter filter : CommonClient.getInstance().getFilters()) {
-                    if (filter.isActive()) {
-                        builder.addParameter("type", filter.getTagName());
-                    }
-                }
+
                 //builder.addParameter("type", "AOF5");
                 buildURL(builder, false);
                 websiteStatus = null;

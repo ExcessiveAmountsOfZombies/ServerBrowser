@@ -113,7 +113,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             if (browsedEntry.isValid()) {
                 entries.add(browsedEntry);
                 if (toTop) {
-                    this.addEntryToTop(browsedEntry);
+                    this.children().add(0, browsedEntry);
                 } else {
                     this.addEntry(browsedEntry);
                 }
@@ -165,7 +165,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             this.serverName = serverName;
             this.ipAddress = ipAddress;
             this.port = port;
-            this.description = Component.literal("Unknown server from 3rd party service.");
+            this.description = new TextComponent("Unknown server from 3rd party service.");
             this.rank = 0;
             this.bgColor = 0x2163bf;
             this.minecraft = minecraft;
