@@ -26,7 +26,13 @@ public class CommonClient {
         client = this;
         this.config = config;
         filters = new LinkedHashSet<>();
-        existingSave = new File(Minecraft.getInstance().gameDirectory, "saves").listFiles().length > 0;
+        File file = new File(Minecraft.getInstance().gameDirectory, "saves");
+        if (file.listFiles() != null) {
+            existingSave = file.listFiles().length > 0;
+        } else {
+            existingSave = false;
+        }
+
     }
 
     public void mergeFilters(List<Filter> filter) {
