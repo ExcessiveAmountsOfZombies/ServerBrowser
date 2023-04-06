@@ -83,7 +83,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
         entries.clear();
         this.clearEntries();
 
-        JsonArray array = new JsonArray();
+        /*JsonArray array = new JsonArray();
         if (ServerBrowserScreen.servers != null) {
             array = ServerBrowserScreen.servers.getAsJsonArray();
         }
@@ -95,8 +95,33 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
                 entries.add(browsedEntry);
                 this.addEntry(browsedEntry);
             }
+        }*/
+    }
+
+    public void addEntries(JsonElement jsonElement, boolean toTop) {
+        JsonArray array = new JsonArray();
+        array = jsonElement.getAsJsonArray();
+        for (JsonElement element : array) {
+            JsonObject object = (JsonObject) element;
+            BrowsedEntry browsedEntry;
+            if (toTop) {
+                browsedEntry = new BrowsedEntry(screen, object.get("name").getAsString(),
+                        object.get("ip").getAsString(), object.get("port").getAsInt(), minecraft);
+            } else {
+                browsedEntry = new BrowsedEntry(screen, object, minecraft);
+            }
+            if (browsedEntry.isValid()) {
+                entries.add(browsedEntry);
+                if (toTop) {
+                    this.addEntryToTop(browsedEntry);
+                } else {
+                    this.addEntry(browsedEntry);
+                }
+            }
         }
     }
+
+
 
 
     protected int getScrollbarPosition() {
@@ -122,7 +147,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
         private final int rank;
         private final int bgColor;
 
-        private final ResourceLocation iconLocation;
+        private ResourceLocation iconLocation;
         @Nullable
         private String lastIconB64;
         @Nullable
@@ -130,10 +155,23 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
 
 
         private final Minecraft minecraft;
-        private final ServerData serverData;
+        private ServerData serverData;
         private long lastClickTime;
 
         private boolean valid = true;
+
+        public BrowsedEntry(ServerBrowserScreen screen, String serverName, String ipAddress, int port, Minecraft minecraft) {
+            this.screen = screen;
+            this.serverName = serverName;
+            this.ipAddress = ipAddress;
+            this.port = port;
+            this.description = Component.literal("Unknown server from 3rd party service.");
+            this.rank = 0;
+            this.bgColor = 0x2163bf;
+            this.minecraft = minecraft;
+            this.tags = new ArrayList<>();
+            assignCommonData();
+        }
 
 
         public BrowsedEntry(ServerBrowserScreen screen, JsonObject object, Minecraft minecraft) {
@@ -157,7 +195,10 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             this.rank = object.get("rank").getAsInt();
             this.bgColor = object.get("backgroundColor").getAsInt();
             this.minecraft = minecraft;
+            assignCommonData();
+        }
 
+        private void assignCommonData() {
             String ip;
             if (port != 0) {
                 ip = this.ipAddress + ":" + port;

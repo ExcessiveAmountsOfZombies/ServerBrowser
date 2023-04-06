@@ -27,6 +27,7 @@ import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class ServerBrowserScreen extends Screen {
 
@@ -135,30 +136,51 @@ public class ServerBrowserScreen extends Screen {
 
     public void queryServers() {
         websiteStatus = null;
-        try {
-            URIBuilder builder = new URIBuilder(CommonClient.URL + "/api/v1/servers");
-            if (page > 1) {
-                builder.addParameter("page", String.valueOf(page));
-            }
-            for (Filter filter : CommonClient.getInstance().getFilters()) {
-                if (filter.isActive()) {
-                    builder.addParameter("type", filter.getTagName());
+        CompletableFuture.runAsync(() -> {
+            try {
+                URIBuilder builder = new URIBuilder(CommonClient.URL + "/api/v1/servers");
+                if (page > 1) {
+                    builder.addParameter("page", String.valueOf(page));
                 }
+                for (Filter filter : CommonClient.getInstance().getFilters()) {
+                    if (filter.isActive()) {
+                        builder.addParameter("type", filter.getTagName());
+                    }
+                }
+                //builder.addParameter("type", "AOF5");
+                buildURL(builder, false);
+                websiteStatus = null;
+            } catch (IOException | URISyntaxException ignored) {
+                websiteStatus = new TextComponent("Website could not be reached at the moment");
             }
-            //builder.addParameter("type", "AOF5");
-            URL url = builder.build().toURL();
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                byte[] bytes = connection.getInputStream().readAllBytes();
-                String string = new String(bytes);
-                servers = JsonParser.parseString(string);
-            }
-            connection.disconnect();
-        } catch (IOException | URISyntaxException ignored) {
-            websiteStatus = new TextComponent("Website could not be reached at the moment");
+        });
+        String packID = CommonClient.getInstance().getSettings().bisectPackID;
+        if (packID.length() > 0) {
+            // b-ruh
+            CompletableFuture.runAsync(() -> {
+                try {
+                    URIBuilder builder = new URIBuilder("https://www.bisecthosting.com/api/v1/public_servers");
+                    builder.addParameter("id", packID);
+                    buildURL(builder, true);
+                } catch (IOException | URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            });
         }
+        websiteStatus = new TextComponent("Website could not be reached at the moment");
+    }
+
+    private void buildURL(URIBuilder builder, boolean top) throws URISyntaxException, IOException {
+        URL url = builder.build().toURL();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        int responseCode = connection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            byte[] bytes = connection.getInputStream().readAllBytes();
+            String string = new String(bytes);
+            list.addEntries(JsonParser.parseString(string), top);
+        }
+        connection.disconnect();
     }
 
     public void setSelected(ServerBrowserList.Entry selected) {
