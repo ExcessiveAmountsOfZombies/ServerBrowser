@@ -9,6 +9,8 @@ public class ConfigSettings {
 
     public boolean serverBrowserNotification = false;
 
+    public String bisectPackID = "";
+
     public String modPackFilter = "";
     public List<OfficialServer> officialServers = new ArrayList<>();
     public List<String> blacklistedServers = new ArrayList<>();
