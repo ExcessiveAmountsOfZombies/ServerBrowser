@@ -27,8 +27,9 @@ public class CommonClient {
         this.config = config;
         filters = new LinkedHashSet<>();
         File file = new File(Minecraft.getInstance().gameDirectory, "saves");
-        if (file.listFiles() != null) {
-            existingSave = file.listFiles().length > 0;
+        File[] files = file.listFiles();
+        if (files != null) {
+            existingSave = files.length > 0;
         } else {
             existingSave = false;
         }
