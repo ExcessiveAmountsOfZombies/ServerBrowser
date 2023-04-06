@@ -1,5 +1,6 @@
 package com.epherical.serverbrowser;
 
+import com.epherical.serverbrowser.client.list.ServerBrowserList;
 import com.google.gson.JsonParser;
 import com.mojang.datafixers.types.Func;
 import org.apache.http.client.utils.URIBuilder;
@@ -11,6 +12,7 @@ import java.net.ProtocolException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -19,12 +21,14 @@ public class ServerQuery {
 
     private final String url;
     private final Consumer<URIBuilder> builderConsumer;
-    private final Function<Throwable, Void> exception;
+    private final Function<Throwable, String> exception;
+    private final BiConsumer<String, Throwable> whenComplete;
 
-    public ServerQuery(String url, Consumer<URIBuilder> builderConsumer, Function<Throwable, Void> exception) {
+    public ServerQuery(String url, Consumer<URIBuilder> builderConsumer, Function<Throwable, String> exception, BiConsumer<String, Throwable> whenComplete) {
         this.url = url;
         this.builderConsumer = builderConsumer;
         this.exception = exception;
+        this.whenComplete = whenComplete;
     }
 
 
@@ -45,7 +49,15 @@ public class ServerQuery {
             } catch (URISyntaxException | IOException e) {
                 throw new RuntimeException(e);
             }
+            return "";
         }).exceptionally(exception);
+    }
+
+    public void buildList(CompletableFuture<String> future, ServerBrowserList list, boolean displayAtTop) {
+        future.handle((s, throwable) -> {
+           list.addEntries(JsonParser.parseString(s), displayAtTop);
+           return s;
+        }).whenComplete(whenComplete);
     }
 
 
