@@ -39,17 +39,18 @@ public class TagList extends ExtendedList<TagList.Entry> {
         return this.width - 10;
     }
 
+    private static int widest = 0;
+
 
     public class TagEntry extends Entry {
-
-        private static int widest = 0;
 
         private final List<CheckboxButton> checkboxes;
 
         public TagEntry(Filter... checkboxes) {
             this.checkboxes = new ArrayList<>();
             for (Filter checkbox : checkboxes) {
-                int width = minecraft.font.width(checkbox.getTagName()) + 20;
+
+                int width = TagList.this.minecraft.font.width(checkbox.getTagName()) + 20;
                 this.checkboxes.add(new CheckboxButton(0, 0, width + 5, 20, new StringTextComponent(checkbox.getTagName()), checkbox.isActive()));
             }
         }

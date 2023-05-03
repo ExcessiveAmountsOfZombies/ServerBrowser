@@ -24,6 +24,7 @@ apply plugin: 'org.spongepowered.mixin'
 version = project.modVersion
 group = project.mavenGroup
 archivesBaseName = modBaseArchiveName + "-" + minecraftVersion + "-FORGE"
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 repositories {
     maven {

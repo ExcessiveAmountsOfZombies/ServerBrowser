@@ -15,5 +15,5 @@ pluginManagement {
 rootProject.name = 'ServerBrowser'
 
 include 'forge'
-include 'fabric'
+//include 'fabric'
 

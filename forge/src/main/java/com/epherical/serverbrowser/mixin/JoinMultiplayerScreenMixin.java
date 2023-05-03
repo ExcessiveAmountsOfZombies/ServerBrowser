@@ -6,19 +6,17 @@ import com.epherical.serverbrowser.client.ScreenButtonGrabber;
 import com.epherical.serverbrowser.client.screen.ServerBrowserScreen;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.gui.screen.MultiplayerScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ServerSelectionList;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldVertexBufferUploader;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -84,9 +82,9 @@ public class JoinMultiplayerScreenMixin extends Screen implements ScreenButtonGr
                 serverBrowser$time = 0;
             }
 
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
-            BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
-            bufferBuilder.begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+            //RenderSystem.setShader(GameRenderer::getPositionColorShader);
+            BufferBuilder bufferBuilder = Tessellator.getInstance().getBuilder();
+            bufferBuilder.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_COLOR);
 
             int segments = 360 + 90;
             double twoPI = Math.PI * 2;
@@ -101,12 +99,23 @@ public class JoinMultiplayerScreenMixin extends Screen implements ScreenButtonGr
                 double sin = Math.sin(-(j * twoPI / 360));
                 double cos = Math.cos(-(j * twoPI / 360));
 
-                bufferBuilder.vertex(centerX + (innerRad * cos), centerY + (innerRad * sin), getBlitOffset()).color(serverBrowser$color).endVertex();
-                bufferBuilder.vertex(centerX + (outerRad * cos), centerY + (outerRad * sin), getBlitOffset()).color(serverBrowser$color).endVertex();
-            }
+                int red = (serverBrowser$color >> 24) & 0xFF;
+                int green = (serverBrowser$color >> 16) & 0xFF;
+                int blue = (serverBrowser$color >> 8) & 0xFF;
 
+                bufferBuilder.vertex(centerX + (innerRad * cos), centerY + (innerRad * sin), getBlitOffset()).color(red, green, blue, 255).endVertex();
+                bufferBuilder.vertex(centerX + (outerRad * cos), centerY + (outerRad * sin), getBlitOffset()).color(red, green, blue, 255).endVertex();
+            }
+            RenderSystem.enableDepthTest();
+            RenderSystem.disableTexture();
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.shadeModel(7425);
             bufferBuilder.end();
-            BufferUploader.end(bufferBuilder);
+            WorldVertexBufferUploader.end(bufferBuilder);
+            RenderSystem.shadeModel(7424);
+            RenderSystem.disableBlend();
+            RenderSystem.enableTexture();
 
             serverBrowser$time++;
         }

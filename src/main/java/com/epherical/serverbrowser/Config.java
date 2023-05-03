@@ -20,7 +20,7 @@ public class Config {
 
         if (Files.exists(path)) {
             try {
-                String json = Files.readString(path);
+                String json = new String(Files.readAllBytes(path));
                 settings = GSON.fromJson(json, ConfigSettings.class);
                 return settings;
             } catch (IOException e) {
@@ -45,7 +45,8 @@ public class Config {
     }
 
     public void saveFile(ConfigSettings settings) throws IOException {
-        Files.writeString(path, GSON.toJson(settings), StandardCharsets.UTF_8, StandardOpenOption.CREATE);
+        Files.write(path, GSON.toJson(settings).getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
+        //Files.writeString(path, GSON.toJson(settings), StandardCharsets.UTF_8, StandardOpenOption.CREATE);
     }
 
 }

@@ -3,17 +3,18 @@ package com.epherical.serverbrowser.client.fm;
 import com.epherical.serverbrowser.client.CommonClient;
 import com.epherical.serverbrowser.client.ScreenButtonGrabber;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import de.keksuccino.fancymenu.events.RenderWidgetEvent;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldVertexBufferUploader;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.lwjgl.opengl.GL11;
 
 public class FancyMenuEvents {
 
@@ -23,7 +24,8 @@ public class FancyMenuEvents {
     @SubscribeEvent
     public void onRender(RenderWidgetEvent.Post event) {
         Screen screen = Minecraft.getInstance().screen;
-        if (screen instanceof ScreenButtonGrabber title) {
+        if (screen instanceof ScreenButtonGrabber) {
+            ScreenButtonGrabber title = (ScreenButtonGrabber) screen;
             Button button = title.grabbedButton();
             if (button.equals(event.getWidget())) {
                 int yPos = button.y;
@@ -43,9 +45,9 @@ public class FancyMenuEvents {
                         time = 0;
                     }
 
-                    RenderSystem.setShader(GameRenderer::getPositionColorShader);
-                    BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
-                    bufferBuilder.begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+                    //RenderSystem.setShader(GameRenderer::getPositionColorShader);
+                    BufferBuilder bufferBuilder = Tessellator.getInstance().getBuilder();
+                    bufferBuilder.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_COLOR);
 
                     int segments = 360 + 90;
                     double twoPI = Math.PI * 2;
@@ -66,13 +68,24 @@ public class FancyMenuEvents {
                 } else {
 
                 }*/
+                        int red = (color >> 24) & 0xFF;
+                        int green = (color >> 16) & 0xFF;
+                        int blue = (color >> 8) & 0xFF;
 
-                        bufferBuilder.vertex(centerX + (innerRad * cos), centerY + (innerRad * sin), screen.getBlitOffset()).color(color).endVertex();
-                        bufferBuilder.vertex(centerX + (outerRad * cos), centerY + (outerRad * sin), screen.getBlitOffset()).color(color).endVertex();
+                        bufferBuilder.vertex(centerX + (innerRad * cos), centerY + (innerRad * sin), screen.getBlitOffset()).color(red, green, blue, 255).endVertex();
+                        bufferBuilder.vertex(centerX + (outerRad * cos), centerY + (outerRad * sin), screen.getBlitOffset()).color(red, green, blue, 255).endVertex();
                     }
 
+                    RenderSystem.enableDepthTest();
+                    RenderSystem.disableTexture();
+                    RenderSystem.enableBlend();
+                    RenderSystem.defaultBlendFunc();
+                    RenderSystem.shadeModel(7425);
                     bufferBuilder.end();
-                    BufferUploader.end(bufferBuilder);
+                    WorldVertexBufferUploader.end(bufferBuilder);
+                    RenderSystem.shadeModel(7424);
+                    RenderSystem.disableBlend();
+                    RenderSystem.enableTexture();
 
                     time++;
                 }

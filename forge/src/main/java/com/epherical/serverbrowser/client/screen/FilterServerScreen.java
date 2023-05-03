@@ -15,6 +15,7 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.button.CheckboxButton;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.client.utils.URIBuilder;
 
 import java.awt.*;
@@ -67,10 +68,12 @@ public class FilterServerScreen extends Screen {
             URIBuilder builder = new URIBuilder(CommonClient.URL + "/api/v1/tags");
             URL url = builder.build().toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("User-Agent", "Server Browser Mod");
             connection.setRequestMethod("GET");
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                byte[] bytes = connection.getInputStream().readAllBytes();
+
+                byte[] bytes = IOUtils.toByteArray((connection.getInputStream()));
                 String string = new String(bytes);
                 JsonArray element = new JsonParser().parse(string).getAsJsonArray();
                 for (JsonElement jsonElement : element) {

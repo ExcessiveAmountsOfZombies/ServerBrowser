@@ -8,7 +8,6 @@ import com.google.gson.JsonParser;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.DialogTexts;
 import net.minecraft.client.gui.screen.ConfirmOpenLinkScreen;
-import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.ConnectingScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
@@ -19,6 +18,7 @@ import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.jetbrains.annotations.Nullable;
 
@@ -101,7 +101,8 @@ public class ServerBrowserScreen extends Screen {
         this.favoriteButton = this.addButton(new Button(this.width / 2 - 154, this.height - 28, 70, 20, new TranslationTextComponent("Favorite"), (button) -> {
             ServerList serverList = new ServerList(this.minecraft);
             ServerBrowserList.Entry entry = this.list.getSelected();
-            if (entry instanceof ServerBrowserList.BrowsedEntry browsedEntry) {
+            if (entry instanceof ServerBrowserList.BrowsedEntry) {
+                ServerBrowserList.BrowsedEntry browsedEntry = (ServerBrowserList.BrowsedEntry) entry;
                 ServerData serverData = browsedEntry.getServerData();
                 serverList.add(serverData);
                 serverList.save();
@@ -149,10 +150,11 @@ public class ServerBrowserScreen extends Screen {
             //builder.addParameter("type", "AOF5");
             URL url = builder.build().toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("User-Agent", "Server Browser Mod");
             connection.setRequestMethod("GET");
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                byte[] bytes = connection.getInputStream().readAllBytes();
+                byte[] bytes = IOUtils.toByteArray((connection.getInputStream()));
                 String string = new String(bytes);
                 servers = new JsonParser().parse(string);
             }
