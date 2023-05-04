@@ -3,8 +3,6 @@ package com.epherical.serverbrowser.client.screen;
 import com.epherical.serverbrowser.client.CommonClient;
 import com.epherical.serverbrowser.client.Filter;
 import com.epherical.serverbrowser.client.list.ServerBrowserList;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
 import net.minecraft.Util;
@@ -19,6 +17,7 @@ import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.apache.http.client.utils.URIBuilder;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
@@ -58,15 +57,15 @@ public class ServerBrowserScreen extends Screen {
         queryServers();
         list.queryServers();
 
-        next = this.addRenderableWidget(new Button(this.width - 110, 12, 60, 20, Component.translatable("Next: " + (page + 1)), button -> {
+        next = this.addRenderableWidget(new Button(this.width - 110, 12, 60, 20, Component.translatable("serverbrowser.button.next_page", (page + 1)), button -> {
             if (list.getEntries().size() >= 20) {
                 page++;
                 queryServers();
                 list.queryServers();
-                button.setMessage(Component.translatable("Next: " + (page + 1)));
+                button.setMessage(Component.translatable("serverbrowser.button.next_page", (page + 1)));
             }
         }));
-        prev = this.addRenderableWidget(new Button(this.width - 140, 12, 30, 20, Component.translatable("Prev"), button -> {
+        prev = this.addRenderableWidget(new Button(this.width - 140, 12, 30, 20, Component.translatable("serverbrowser.button.prev_page"), button -> {
             if (page <= 1) {
                 page = 1;
             } else {
@@ -74,10 +73,10 @@ public class ServerBrowserScreen extends Screen {
                 queryServers();
                 list.queryServers();
             }
-            next.setMessage(Component.translatable("Next: " + (page + 1)));
+            next.setMessage(Component.translatable("serverbrowser.button.next_page", (page + 1)));
         }));
 
-        this.addRenderableWidget(new Button(this.width / 2 - 50, 3, 100, 20, Component.literal("Register Server"), button -> {
+        this.addRenderableWidget(new Button(this.width / 2 - 50, 3, 100, 20, new TranslatableComponent("serverbrowser.button.register"), button -> {
             this.minecraft.setScreen(new ConfirmLinkScreen((bl) -> {
                 if (bl) {
                     Util.getPlatform().openUri("https://minecraft.multiplayerservers.net");
@@ -88,13 +87,13 @@ public class ServerBrowserScreen extends Screen {
         this.joinButton = this.addRenderableWidget(new Button(this.width / 2 - 154, this.height - 52, 100, 20, Component.translatable("selectServer.select"), (button) -> {
             this.joinSelectedServer();
         }));
-        this.addRenderableWidget(new Button(this.width / 2 - 50, this.height - 52, 100, 20, Component.translatable("Filter Servers"), (button) -> {
+        this.addRenderableWidget(new Button(this.width / 2 - 50, this.height - 52, 100, 20, Component.translatable("serverbrowser.button.filter"), (button) -> {
             this.minecraft.setScreen(new FilterServerScreen(this));
         }));
-        this.addRenderableWidget(new Button(this.width / 2 + 54, this.height - 52, 100, 20, Component.translatable("History (WIP)"), (button) -> {
+        this.addRenderableWidget(new Button(this.width / 2 + 54, this.height - 52, 100, 20, Component.translatable("serverbrowser.button.history"), (button) -> {
             // todo; store 20 servers last joined from this screen.
         }));
-        this.favoriteButton = this.addRenderableWidget(new Button(this.width / 2 - 154, this.height - 28, 70, 20, Component.translatable("Favorite"), (button) -> {
+        this.favoriteButton = this.addRenderableWidget(new Button(this.width / 2 - 154, this.height - 28, 70, 20, Component.translatable("serverbrowser.button.favorite"), (button) -> {
             ServerList serverList = new ServerList(this.minecraft);
             ServerBrowserList.Entry entry = this.list.getSelected();
             if (entry instanceof ServerBrowserList.BrowsedEntry browsedEntry) {
@@ -152,7 +151,7 @@ public class ServerBrowserScreen extends Screen {
                 }
             }
         }, throwable -> {
-            websiteStatus = new TextComponent("Website could not be reached at the moment");
+            websiteStatus = new TranslatableComponent("serverbrowser.error.unreachable_website");
             return "";
         }, (s, throwable) -> {
             websiteStatus = null;
@@ -160,7 +159,7 @@ public class ServerBrowserScreen extends Screen {
         main.buildList(main.runQuery(), list, false);
 
         String packID = CommonClient.getInstance().getSettings().bisectPackID;
-        if (packID.length() > 0) {
+        if (packID.length() > 0 && !(page > 1)) {
             // b-ruh
             ServerQuery bisect = new ServerQuery("https://www.bisecthosting.com/api/v1/public_servers", builder -> {
                 builder.addParameter("id", packID);
@@ -172,7 +171,7 @@ public class ServerBrowserScreen extends Screen {
             });
             bisect.buildList(bisect.runQuery(), list, true);
         }
-        websiteStatus = Component.literal("Website could not be reached at the moment");
+        websiteStatus = new TranslatableComponent("serverbrowser.error.unreachable_website");
     }
 
     public void setSelected(ServerBrowserList.Entry selected) {
