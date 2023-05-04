@@ -162,7 +162,12 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
 
         public BrowsedEntry(ServerBrowserScreen screen, String serverName, String ipAddress, int port, Minecraft minecraft) {
             this.screen = screen;
-            this.serverName = serverName;
+            int strLen = serverName.length();
+            if (strLen <= 45) {
+                this.serverName = serverName;
+            } else {
+                this.serverName = serverName.substring(0, 45);
+            }
             this.ipAddress = ipAddress;
             this.port = port;
             this.description = new TextComponent("Unknown server from 3rd party service.");
@@ -176,7 +181,13 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
 
         public BrowsedEntry(ServerBrowserScreen screen, JsonObject object, Minecraft minecraft) {
             this.screen = screen;
-            this.serverName = object.get("serverName").getAsString();
+            String serverName = object.get("serverName").getAsString();
+            int strLen = serverName.length();
+            if (strLen <= 40) {
+                this.serverName = serverName;
+            } else {
+                this.serverName = serverName.substring(0, 40);
+            }
             this.ipAddress = object.get("ipAddress").getAsString();
             this.port = object.get("port").getAsInt();
 
@@ -211,7 +222,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             if (abstractTexture != MissingTextureAtlasSprite.getTexture() && abstractTexture instanceof DynamicTexture) {
                 this.icon = (DynamicTexture) abstractTexture;
             }
-            this.serverData = new ServerData(serverName, ipAddress, false);
+            this.serverData = new ServerData(serverName, ip, false);
         }
 
 

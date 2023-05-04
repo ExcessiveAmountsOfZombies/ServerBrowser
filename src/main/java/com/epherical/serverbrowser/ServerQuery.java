@@ -2,13 +2,10 @@ package com.epherical.serverbrowser;
 
 import com.epherical.serverbrowser.client.list.ServerBrowserList;
 import com.google.gson.JsonParser;
-import com.mojang.datafixers.types.Func;
 import org.apache.http.client.utils.URIBuilder;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
