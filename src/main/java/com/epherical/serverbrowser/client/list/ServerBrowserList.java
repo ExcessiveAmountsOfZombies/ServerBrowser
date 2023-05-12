@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -146,7 +147,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
 
         private ResourceLocation iconLocation;
         @Nullable
-        private String lastIconB64;
+        private byte[] lastIconB64;
         @Nullable
         private DynamicTexture icon;
 
@@ -317,12 +318,12 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.setShaderTexture(0, GuiComponent.GUI_ICONS_LOCATION);
             GuiComponent.blit(poseStack, left + width - 15, top, (float) (k * 10), (float) (176 + latency * 8), 10, 8, 256, 256);
-            String string = this.serverData.getIconB64();
-            if (!Objects.equals(string, this.lastIconB64)) {
-                if (this.uploadServerIcon(string)) {
-                    this.lastIconB64 = string;
+            byte[] abyte = this.serverData.getIconBytes();
+            if (!Arrays.equals(abyte, this.lastIconB64)) {
+                if (this.uploadServerIcon(abyte)) {
+                    this.lastIconB64 = abyte;
                 } else {
-                    this.serverData.setIconB64(null);
+                    this.serverData.setIconBytes(null);
                     //this.updateServerList();
                 }
             }
@@ -394,7 +395,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             RenderSystem.disableBlend();
         }
 
-        private boolean uploadServerIcon(@Nullable String icon) {
+        private boolean uploadServerIcon(@Nullable byte[] icon) {
             if (icon == null) {
                 this.minecraft.getTextureManager().release(this.iconLocation);
                 if (this.icon != null && this.icon.getPixels() != null) {
@@ -404,7 +405,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
                 this.icon = null;
             } else {
                 try {
-                    NativeImage nativeImage = NativeImage.fromBase64(icon);
+                    NativeImage nativeImage = NativeImage.read(icon);
                     Validate.validState(nativeImage.getWidth() == 64, "Must be 64 pixels wide");
                     Validate.validState(nativeImage.getHeight() == 64, "Must be 64 pixels high");
                     if (this.icon == null) {

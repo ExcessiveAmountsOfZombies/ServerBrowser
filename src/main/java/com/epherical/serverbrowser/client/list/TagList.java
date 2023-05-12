@@ -59,14 +59,14 @@ public class TagList extends ContainerObjectSelectionList<TagList.Entry> {
             int itemWidth = 0;
             int increment = 0;
             for (Checkbox checkbox : checkboxes) {
-                checkbox.x = (left + itemWidth);
-                checkbox.y = (top);
+                checkbox.setX((left + itemWidth)) ;
+                checkbox.setY((top));
                 itemWidth += checkbox.getWidth();
                 if (increment == 0 && itemWidth >= widest) {
                     widest = itemWidth;
                 }
                 if (increment == 1) {
-                    checkbox.x = (left + widest);
+                    checkbox.setX((left + widest));
                 }
                 checkbox.render(poseStack, mouseX, mouseY, partialTick);
                 increment++;

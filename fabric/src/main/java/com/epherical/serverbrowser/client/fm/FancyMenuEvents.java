@@ -26,8 +26,8 @@ public class FancyMenuEvents {
         if (screen instanceof ScreenButtonGrabber title) {
             Button button = title.grabbedButton();
             if (button.equals(event.getWidget())) {
-                int yPos = button.y;
-                int xPos = button.x;
+                int yPos = button.getY();
+                int xPos = button.getX();
 
                 if (CommonClient.displayCircle()) {
                     if (time < 20) {
@@ -60,8 +60,8 @@ public class FancyMenuEvents {
                         double sin = Math.sin(-(j * twoPI / 360));
                         double cos = Math.cos(-(j * twoPI / 360));
 
-                        bufferBuilder.vertex(centerX + (innerRad * cos), centerY + (innerRad * sin), screen.getBlitOffset()).color(color).endVertex();
-                        bufferBuilder.vertex(centerX + (outerRad * cos), centerY + (outerRad * sin), screen.getBlitOffset()).color(color).endVertex();
+                        bufferBuilder.vertex(centerX + (innerRad * cos), centerY + (innerRad * sin), 0).color(color).endVertex();
+                        bufferBuilder.vertex(centerX + (outerRad * cos), centerY + (outerRad * sin), 0).color(color).endVertex();
                     }
 
                     BufferUploader.drawWithShader(bufferBuilder.end());

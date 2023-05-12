@@ -45,11 +45,11 @@ public class JoinMultiplayerScreenMixin extends Screen implements ScreenButtonGr
 
     @Inject(method = "init", at = @At(value = "TAIL"))
     public void serverBrowserAddBrowserButton(CallbackInfo ci) {
-        serverBrowser$button = this.addRenderableWidget(new Button(3, 3, 120, 20, Component.translatable("Server Browser"), button -> {
+        serverBrowser$button = this.addRenderableWidget(Button.builder(Component.translatable("Server Browser"), button -> {
             minecraft.setScreen(new ServerBrowserScreen(this));
             CommonClient.getInstance().getSettings().serverBrowserNotification = false;
             CommonClient.getInstance().saveConfig();
-        }));
+        }).bounds(3, 3, 120, 20).build());
     }
 
     @Inject(method = "onSelectedChange", at = @At("TAIL"))
@@ -62,8 +62,8 @@ public class JoinMultiplayerScreenMixin extends Screen implements ScreenButtonGr
 
     @Inject(method = "render", at = @At("TAIL"))
     public void serverBrowser$modifyRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
-        int yPos = serverBrowser$button.y;
-        int xPos = serverBrowser$button.x;
+        int yPos = serverBrowser$button.getY();
+        int xPos = serverBrowser$button.getX();
 
         if (CommonClient.displayCircle()) {
             if (serverBrowser$time < 20) {
@@ -96,8 +96,8 @@ public class JoinMultiplayerScreenMixin extends Screen implements ScreenButtonGr
                 double sin = Math.sin(-(j * twoPI / 360));
                 double cos = Math.cos(-(j * twoPI / 360));
 
-                bufferBuilder.vertex(centerX + (innerRad * cos), centerY + (innerRad * sin), getBlitOffset()).color(serverBrowser$color).endVertex();
-                bufferBuilder.vertex(centerX + (outerRad * cos), centerY + (outerRad * sin), getBlitOffset()).color(serverBrowser$color).endVertex();
+                bufferBuilder.vertex(centerX + (innerRad * cos), centerY + (innerRad * sin), 0).color(serverBrowser$color).endVertex();
+                bufferBuilder.vertex(centerX + (outerRad * cos), centerY + (outerRad * sin), 0).color(serverBrowser$color).endVertex();
             }
 
             BufferUploader.drawWithShader(bufferBuilder.end());

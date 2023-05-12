@@ -45,8 +45,8 @@ public abstract class TitleScreenMixin extends Screen implements ScreenButtonGra
 
     @Inject(method = "render", at = @At("TAIL"))
     public void serverBrowser$renderOutline(PoseStack poseStack, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
-        int yPos = serverBrowser$grabbedMultiplayerButton.y;
-        int xPos = serverBrowser$grabbedMultiplayerButton.x;
+        int yPos = serverBrowser$grabbedMultiplayerButton.getY();
+        int xPos = serverBrowser$grabbedMultiplayerButton.getX();
 
         if (CommonClient.displayCircle()) {
             if (serverBrowser$time < 20) {
@@ -86,8 +86,8 @@ public abstract class TitleScreenMixin extends Screen implements ScreenButtonGra
 
                 }*/
 
-                bufferBuilder.vertex(centerX + (innerRad * cos), centerY + (innerRad * sin), getBlitOffset()).color(serverBrowser$color).endVertex();
-                bufferBuilder.vertex(centerX + (outerRad * cos), centerY + (outerRad * sin), getBlitOffset()).color(serverBrowser$color).endVertex();
+                bufferBuilder.vertex(centerX + (innerRad * cos), centerY + (innerRad * sin), 0).color(serverBrowser$color).endVertex();
+                bufferBuilder.vertex(centerX + (outerRad * cos), centerY + (outerRad * sin), 0).color(serverBrowser$color).endVertex();
             }
             BufferUploader.drawWithShader(bufferBuilder.end());
 

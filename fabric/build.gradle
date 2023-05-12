@@ -49,7 +49,7 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraftVersion}"
     mappings loom.layered() {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${project.minecraftVersion}:${project.parchmentVersion}")
+        //parchment("org.parchmentmc.data:parchment-${project.minecraftVersion}:${project.parchmentVersion}")
     }
 
     modImplementation "net.fabricmc:fabric-loader:${project.fabricLoaderVersion}"
