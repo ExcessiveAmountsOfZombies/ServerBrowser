@@ -2,6 +2,7 @@ package com.epherical.serverbrowser.client.screen;
 
 import com.epherical.serverbrowser.client.CommonClient;
 import com.epherical.serverbrowser.client.Filter;
+import com.epherical.serverbrowser.client.ServerPinger;
 import com.epherical.serverbrowser.client.list.ServerBrowserList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
@@ -28,7 +29,7 @@ public class ServerBrowserScreen extends Screen {
     private static final Logger LOGGER = LogUtils.getLogger();
 
 
-    private final ServerStatusPinger pinger = new ServerStatusPinger();
+    private final ServerPinger pinger = new ServerPinger();
     protected ServerBrowserList list;
 
     private Button joinButton;
@@ -204,7 +205,7 @@ public class ServerBrowserScreen extends Screen {
         list.refreshServers();
     }
 
-    public ServerStatusPinger getPinger() {
+    public ServerPinger getPinger() {
         return pinger;
     }
 
