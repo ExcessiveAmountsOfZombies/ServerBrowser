@@ -12,6 +12,8 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.multiplayer.ServerStatusPinger;
@@ -101,13 +103,14 @@ public class ServerBrowserScreen extends Screen {
                 ServerData serverData = browsedEntry.getServerData();
                 serverList.add(serverData);
                 serverList.save();
+                this.minecraft.setScreen(new JoinMultiplayerScreen(this));
             }
         }));
         this.addRenderableWidget(new Button(this.width / 2 - 80, this.height - 28, 156, 20, new TranslatableComponent("selectServer.refresh"), (button) -> {
             this.refreshServerList();
         }));
         this.addRenderableWidget(new Button(this.width / 2 + 4 + 76, this.height - 28, 75, 20, CommonComponents.GUI_CANCEL, (button) -> {
-            this.minecraft.setScreen(null);
+            this.minecraft.setScreen(new JoinMultiplayerScreen(new TitleScreen()));
         }));
 
         this.addWidget(list);
