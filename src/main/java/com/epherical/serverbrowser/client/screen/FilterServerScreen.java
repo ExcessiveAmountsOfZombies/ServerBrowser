@@ -32,7 +32,7 @@ public class FilterServerScreen extends Screen {
     protected TagList list;
 
     protected FilterServerScreen(Screen previousScreen) {
-        super(Component.literal("Filter Servers"));
+        super(Component.translatable("serverbrowser.button.filter"));
         this.previousScreen = previousScreen;
     }
 
@@ -85,7 +85,7 @@ public class FilterServerScreen extends Screen {
             }
             connection.disconnect();
         } catch (URISyntaxException | IOException e) {
-            websiteStatus = Component.literal("Website could not be reached at the moment");
+            websiteStatus = Component.translatable("serverbrowser.error.unreachable_website");
         }
     }
 

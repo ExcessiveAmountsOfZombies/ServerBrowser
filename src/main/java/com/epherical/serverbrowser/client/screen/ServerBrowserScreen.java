@@ -1,48 +1,48 @@
 package com.epherical.serverbrowser.client.screen;
 
+import com.epherical.serverbrowser.ServerQuery;
 import com.epherical.serverbrowser.client.CommonClient;
 import com.epherical.serverbrowser.client.Filter;
+import com.epherical.serverbrowser.client.ServerPinger;
 import com.epherical.serverbrowser.client.list.ServerBrowserList;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.logging.LogUtils;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
-import net.minecraft.client.multiplayer.ServerStatusPinger;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import org.apache.http.client.utils.URIBuilder;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public class ServerBrowserScreen extends Screen {
 
+    private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final ServerStatusPinger pinger = new ServerStatusPinger();
+
+    private final ServerPinger pinger = new ServerPinger();
     protected ServerBrowserList list;
 
     private Button joinButton;
     private Button favoriteButton;
+
+    private Button next;
+    private Button prev;
 
     @Nullable
     private List<Component> toolTip;
     private Component websiteStatus;
 
     private Screen previousScreen;
-
-    public static JsonElement servers;
 
     private int page = 1;
 
@@ -54,11 +54,29 @@ public class ServerBrowserScreen extends Screen {
 
     @Override
     protected void init() {
-        queryServers();
         list = new ServerBrowserList(this, this.minecraft, this.width, this.height, 32, this.height - 64, 36);
+        queryServers();
         list.queryServers();
 
-        if (list.getEntries().size() >= 20) {
+        next = this.addRenderableWidget(new Button(this.width - 110, 12, 60, 20, Component.translatable("serverbrowser.button.next_page", (page + 1)), button -> {
+            if (list.getEntries().size() >= 20) {
+                page++;
+                queryServers();
+                list.queryServers();
+                button.setMessage(Component.translatable("serverbrowser.button.next_page", (page + 1)));
+            }
+        }));
+        prev = this.addRenderableWidget(new Button(this.width - 140, 12, 30, 20, Component.translatable("serverbrowser.button.prev_page"), button -> {
+            if (page <= 1) {
+                page = 1;
+            } else {
+                page--;
+                queryServers();
+                list.queryServers();
+            }
+            next.setMessage(Component.translatable("serverbrowser.button.next_page", (page + 1)));
+        }));
+       // if (list.getEntries().size() >= 20) {
             Button nextButton = this.addRenderableWidget(Button.builder(Component.translatable("Next: " + (page + 1)), button -> {
                 if (list.getEntries().size() >= 20) {
                     page++;
@@ -79,7 +97,7 @@ public class ServerBrowserScreen extends Screen {
             }).bounds(this.width - 140, 12, 30, 20).build());
         }
 
-        this.addRenderableWidget(Button.builder(Component.literal("Register Server"), button -> {
+        this.addRenderableWidget(Button.builder(Component.translatable("serverbrowser.button.register"), button -> {
             this.minecraft.setScreen(new ConfirmLinkScreen((bl) -> {
                 if (bl) {
                     Util.getPlatform().openUri("https://minecraft.multiplayerservers.net");
@@ -90,26 +108,27 @@ public class ServerBrowserScreen extends Screen {
         this.joinButton = this.addRenderableWidget(Button.builder(Component.translatable("selectServer.select"), (button) -> {
             this.joinSelectedServer();
         }).bounds(this.width / 2 - 154, this.height - 52, 100, 20).build());
-        this.addRenderableWidget(Button.builder(Component.translatable("Filter Servers"), (button) -> {
+        this.addRenderableWidget(Button.builder(Component.translatable("serverbrowser.button.filter"), (button) -> {
             this.minecraft.setScreen(new FilterServerScreen(this));
         }).bounds(this.width / 2 - 50, this.height - 52, 100, 20).build());
-        this.addRenderableWidget(Button.builder( Component.translatable("History (WIP)"), (button) -> {
+        this.addRenderableWidget(Button.builder( Component.translatable("serverbrowser.button.history"), (button) -> {
             // todo; store 20 servers last joined from this screen.
         }).bounds(this.width / 2 + 54, this.height - 52, 100, 20).build());
-        this.favoriteButton = this.addRenderableWidget(Button.builder(Component.translatable("Favorite"), (button) -> {
+        this.favoriteButton = this.addRenderableWidget(Button.builder(Component.translatable("serverbrowser.button.favorite"), (button) -> {
             ServerList serverList = new ServerList(this.minecraft);
             ServerBrowserList.Entry entry = this.list.getSelected();
             if (entry instanceof ServerBrowserList.BrowsedEntry browsedEntry) {
                 ServerData serverData = browsedEntry.getServerData();
                 serverList.add(serverData, false);
                 serverList.save();
+                this.minecraft.setScreen(new JoinMultiplayerScreen(this));
             }
         }).bounds(this.width / 2 - 154, this.height - 28, 70, 20).build());
         this.addRenderableWidget(Button.builder(Component.translatable("selectServer.refresh"), (button) -> {
             this.refreshServerList();
         }).bounds(this.width / 2 - 80, this.height - 28, 156, 20).build());
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_CANCEL, (button) -> {
-            this.minecraft.setScreen(null);
+            this.minecraft.setScreen(new JoinMultiplayerScreen(new TitleScreen()));
         }).bounds(this.width / 2 + 4 + 76, this.height - 28, 75, 20).build());
 
         this.addWidget(list);
@@ -126,6 +145,16 @@ public class ServerBrowserScreen extends Screen {
         if (this.toolTip != null) {
             this.renderComponentTooltip(poseStack, this.toolTip, mouseX, mouseY);
         }
+        next.active = false;
+        prev.active = false;
+        if (list.getEntries().size() >= 20) {
+            next.active = true;
+            //prev.active = true;
+        }
+        if (page > 1) {
+            prev.active = true;
+        }
+
 
         if (websiteStatus != null) {
             drawCenteredString(poseStack, minecraft.font, websiteStatus, width / 2, 40, 0xFFFFFF);
@@ -134,51 +163,37 @@ public class ServerBrowserScreen extends Screen {
 
     public void queryServers() {
         websiteStatus = null;
-        CompletableFuture.runAsync(() -> {
-            try {
-                URIBuilder builder = new URIBuilder(CommonClient.URL + "/api/v1/servers");
-                if (page > 1) {
-                    builder.addParameter("page", String.valueOf(page));
-                }
-                for (Filter filter : CommonClient.getInstance().getFilters()) {
-                    if (filter.isActive()) {
-                        builder.addParameter("type", filter.getTagName());
-                    }
-                }
-                //builder.addParameter("type", "AOF5");
-                buildURL(builder, false);
-                websiteStatus = null;
-            } catch (IOException | URISyntaxException ignored) {
-                websiteStatus = Component.literal("Website could not be reached at the moment");
+        ServerQuery main = new ServerQuery(CommonClient.URL + "/api/v1/servers", builder -> {
+            if (page > 1) {
+                builder.addParameter("page", String.valueOf(page));
             }
-        });
-        String packID = CommonClient.getInstance().getSettings().bisectPackID;
-        if (packID.length() > 0) {
-            // b-ruh
-            CompletableFuture.runAsync(() -> {
-                try {
-                    URIBuilder builder = new URIBuilder("https://www.bisecthosting.com/api/v1/public_servers");
-                    builder.addParameter("id", packID);
-                    buildURL(builder, true);
-                } catch (IOException | URISyntaxException e) {
-                    e.printStackTrace();
+            for (Filter filter : CommonClient.getInstance().getFilters()) {
+                if (filter.isActive()) {
+                    builder.addParameter("type", filter.getTagName());
                 }
-            });
-        }
-        websiteStatus = Component.literal("Website could not be reached at the moment");
-    }
+            }
+        }, throwable -> {
+            websiteStatus = Component.translatable("serverbrowser.error.unreachable_website");
+            return "";
+        }, (s, throwable) -> {
+            websiteStatus = null;
+        });
+        main.buildList(main.runQuery(), list, false);
 
-    private void buildURL(URIBuilder builder, boolean top) throws URISyntaxException, IOException {
-        URL url = builder.build().toURL();
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            byte[] bytes = connection.getInputStream().readAllBytes();
-            String string = new String(bytes);
-            list.addEntries(JsonParser.parseString(string), top);
+        String packID = CommonClient.getInstance().getSettings().bisectPackID;
+        if (packID.length() > 0 && !(page > 1)) {
+            // b-ruh
+            ServerQuery bisect = new ServerQuery("https://www.bisecthosting.com/api/v1/public_servers", builder -> {
+                builder.addParameter("id", packID);
+            }, throwable -> {
+                LOGGER.warn("Could not ping bisect's servers", throwable);
+                return "";
+            }, (s, throwable) -> {
+
+            });
+            bisect.buildList(bisect.runQuery(), list, true);
         }
-        connection.disconnect();
+        websiteStatus = Component.translatable("serverbrowser.error.unreachable_website");
     }
 
     public void setSelected(ServerBrowserList.Entry selected) {
@@ -211,7 +226,7 @@ public class ServerBrowserScreen extends Screen {
         list.refreshServers();
     }
 
-    public ServerStatusPinger getPinger() {
+    public ServerPinger getPinger() {
         return pinger;
     }
 
