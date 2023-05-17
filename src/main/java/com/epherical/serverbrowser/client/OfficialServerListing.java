@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
 import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 
 /**
  * This class exists just so we can call createEntry, so that I can put these entries into the mixin
@@ -13,7 +13,7 @@ import net.minecraft.network.chat.TranslatableComponent;
  */
 public class OfficialServerListing extends ServerSelectionList {
 
-    private static final TranslatableComponent OFFICIAL = new TranslatableComponent("serverbrowser.server.official");
+    private static final Component OFFICIAL = Component.translatable("serverbrowser.server.official");
 
     public OfficialServerListing(JoinMultiplayerScreen joinMultiplayerScreen, Minecraft minecraft, int i, int j, int k, int l, int m) {
         super(joinMultiplayerScreen, minecraft, i, j, k, l, m);

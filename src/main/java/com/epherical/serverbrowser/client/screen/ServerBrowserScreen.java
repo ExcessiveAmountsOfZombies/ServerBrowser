@@ -1,5 +1,6 @@
 package com.epherical.serverbrowser.client.screen;
 
+import com.epherical.serverbrowser.ServerQuery;
 import com.epherical.serverbrowser.client.CommonClient;
 import com.epherical.serverbrowser.client.Filter;
 import com.epherical.serverbrowser.client.ServerPinger;
@@ -15,12 +16,9 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
-import net.minecraft.client.multiplayer.ServerStatusPinger;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import org.apache.http.client.utils.URIBuilder;
-import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
@@ -79,7 +77,7 @@ public class ServerBrowserScreen extends Screen {
             next.setMessage(Component.translatable("serverbrowser.button.next_page", (page + 1)));
         }));
 
-        this.addRenderableWidget(new Button(this.width / 2 - 50, 3, 100, 20, new TranslatableComponent("serverbrowser.button.register"), button -> {
+        this.addRenderableWidget(new Button(this.width / 2 - 50, 3, 100, 20, Component.translatable("serverbrowser.button.register"), button -> {
             this.minecraft.setScreen(new ConfirmLinkScreen((bl) -> {
                 if (bl) {
                     Util.getPlatform().openUri("https://minecraft.multiplayerservers.net");
@@ -155,7 +153,7 @@ public class ServerBrowserScreen extends Screen {
                 }
             }
         }, throwable -> {
-            websiteStatus = new TranslatableComponent("serverbrowser.error.unreachable_website");
+            websiteStatus = Component.translatable("serverbrowser.error.unreachable_website");
             return "";
         }, (s, throwable) -> {
             websiteStatus = null;
@@ -175,7 +173,7 @@ public class ServerBrowserScreen extends Screen {
             });
             bisect.buildList(bisect.runQuery(), list, true);
         }
-        websiteStatus = new TranslatableComponent("serverbrowser.error.unreachable_website");
+        websiteStatus = Component.translatable("serverbrowser.error.unreachable_website");
     }
 
     public void setSelected(ServerBrowserList.Entry selected) {

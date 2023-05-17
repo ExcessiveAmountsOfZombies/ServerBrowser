@@ -26,10 +26,12 @@ import org.slf4j.Logger;
 
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class ServerPinger {
@@ -62,42 +64,54 @@ public class ServerPinger {
                         connection.disconnect(Component.translatable("multiplayer.status.unrequested"));
                     } else {
                         this.receivedPing = true;
-                        ServerStatus serverStatus = responsePacket.status();
-                        data.motd = serverStatus.description();
-                        serverStatus.version().ifPresentOrElse((version) -> {
-                            data.version = Component.literal(version.name());
-                            data.protocol = version.protocol();
-                        }, () -> {
+                        ServerStatus serverstatus = responsePacket.getStatus();
+                        if (serverstatus.getDescription() != null) {
+                            data.motd = serverstatus.getDescription();
+                        } else {
+                            data.motd = CommonComponents.EMPTY;
+                        }
+
+                        if (serverstatus.getVersion() != null) {
+                            data.version = Component.literal(serverstatus.getVersion().getName());
+                            data.protocol = serverstatus.getVersion().getProtocol();
+                        } else {
                             data.version = Component.translatable("multiplayer.status.old");
                             data.protocol = 0;
-                        });
-                        serverStatus.players().ifPresentOrElse((players) -> {
-                            data.status = ServerPinger.formatPlayerCount(players.online(), players.max());
-                            data.players = players;
-                            if (!players.sample().isEmpty()) {
-                                List<Component> messages = new ArrayList<>(players.sample().size());
+                        }
 
-                                for (GameProfile profile : players.sample()) {
-                                    messages.add(Component.literal(profile.getName()));
+                        if (serverstatus.getPlayers() != null) {
+                            data.status = ServerPinger.formatPlayerCount(serverstatus.getPlayers().getNumPlayers(), serverstatus.getPlayers().getMaxPlayers());
+                            List<Component> list = Lists.newArrayList();
+                            GameProfile[] agameprofile = serverstatus.getPlayers().getSample();
+                            if (agameprofile != null && agameprofile.length > 0) {
+                                for(GameProfile gameprofile : agameprofile) {
+                                    list.add(Component.literal(gameprofile.getName()));
                                 }
 
-                                if (players.sample().size() < players.online()) {
-                                    messages.add(Component.translatable("multiplayer.status.and_more", players.online() - players.sample().size()));
+                                if (agameprofile.length < serverstatus.getPlayers().getNumPlayers()) {
+                                    list.add(Component.translatable("multiplayer.status.and_more", serverstatus.getPlayers().getNumPlayers() - agameprofile.length));
                                 }
 
-                                data.playerList = messages;
-                            } else {
-                                data.playerList = List.of();
+                                data.playerList = list;
                             }
+                        } else {
+                            data.status = Component.translatable("multiplayer.status.unknown").withStyle(ChatFormatting.DARK_GRAY);
+                        }
 
-                        }, () -> data.status = Component.translatable("multiplayer.status.unknown").withStyle(ChatFormatting.DARK_GRAY));
-                        serverStatus.favicon().ifPresent(($$2) -> {
-                            if (!Arrays.equals($$2.iconBytes(), data.getIconBytes())) {
-                                data.setIconBytes($$2.iconBytes());
-                                runnable.run();
+                        String s = serverstatus.getFavicon();
+                        if (s != null) {
+                            try {
+                                s = ServerData.parseFavicon(s);
+                            } catch (ParseException parseexception) {
+                                LOGGER.error("Invalid server icon", (Throwable)parseexception);
                             }
+                        }
 
-                        });
+                        if (!Objects.equals(s, data.getIconB64())) {
+                            data.setIconB64(s);
+                            runnable.run();
+                        }
+
                         this.pingStart = Util.getMillis();
                         connection.send(new ServerboundPingRequestPacket(this.pingStart));
                         this.success = true;
@@ -115,6 +129,11 @@ public class ServerPinger {
                     if (!this.success) {
                         ServerPinger.this.onPingFailed(message, data);
                     }
+                }
+
+                @Override
+                public Connection getConnection() {
+                    return connection;
                 }
 
                 public boolean isAcceptingMessages() {

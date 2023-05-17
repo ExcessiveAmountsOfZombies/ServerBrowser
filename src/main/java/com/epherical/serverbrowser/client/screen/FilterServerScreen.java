@@ -14,8 +14,6 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import org.apache.http.client.utils.URIBuilder;
 
 import java.io.IOException;
@@ -34,7 +32,7 @@ public class FilterServerScreen extends Screen {
     protected TagList list;
 
     protected FilterServerScreen(Screen previousScreen) {
-        super(new TranslatableComponent("serverbrowser.button.filter"));
+        super(Component.translatable("serverbrowser.button.filter"));
         this.previousScreen = previousScreen;
     }
 
@@ -87,7 +85,7 @@ public class FilterServerScreen extends Screen {
             }
             connection.disconnect();
         } catch (URISyntaxException | IOException e) {
-            websiteStatus = new TranslatableComponent("serverbrowser.error.unreachable_website");
+            websiteStatus = Component.translatable("serverbrowser.error.unreachable_website");
         }
     }
 
