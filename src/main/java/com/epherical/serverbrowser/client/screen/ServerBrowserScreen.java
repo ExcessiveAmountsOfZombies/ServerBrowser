@@ -58,15 +58,15 @@ public class ServerBrowserScreen extends Screen {
         queryServers();
         list.queryServers();
 
-        next = this.addRenderableWidget(new Button(this.width - 110, 12, 60, 20, Component.translatable("serverbrowser.button.next_page", (page + 1)), button -> {
+        next = this.addRenderableWidget(Button.builder(Component.translatable("serverbrowser.button.next_page", (page + 1)), button -> {
             if (list.getEntries().size() >= 20) {
                 page++;
                 queryServers();
                 list.queryServers();
                 button.setMessage(Component.translatable("serverbrowser.button.next_page", (page + 1)));
             }
-        }));
-        prev = this.addRenderableWidget(new Button(this.width - 140, 12, 30, 20, Component.translatable("serverbrowser.button.prev_page"), button -> {
+        }).bounds(this.width - 110, 12, 60, 20).build());
+        prev = this.addRenderableWidget(Button.builder(Component.translatable("serverbrowser.button.prev_page"), button -> {
             if (page <= 1) {
                 page = 1;
             } else {
@@ -75,27 +75,7 @@ public class ServerBrowserScreen extends Screen {
                 list.queryServers();
             }
             next.setMessage(Component.translatable("serverbrowser.button.next_page", (page + 1)));
-        }));
-       // if (list.getEntries().size() >= 20) {
-            Button nextButton = this.addRenderableWidget(Button.builder(Component.translatable("Next: " + (page + 1)), button -> {
-                if (list.getEntries().size() >= 20) {
-                    page++;
-                    queryServers();
-                    list.queryServers();
-                    button.setMessage(Component.translatable("Next: " + (page + 1)));
-                }
-            }).bounds(this.width - 110, 12, 60, 20).build());
-            this.addRenderableWidget(Button.builder(Component.translatable("Prev"), button -> {
-                if (page <= 1) {
-                    page = 1;
-                } else {
-                    page--;
-                    queryServers();
-                    list.queryServers();
-                }
-                nextButton.setMessage(Component.translatable("Next: " + (page + 1)));
-            }).bounds(this.width - 140, 12, 30, 20).build());
-        }
+        }).bounds(this.width - 140, 12, 30, 20).build());
 
         this.addRenderableWidget(Button.builder(Component.translatable("serverbrowser.button.register"), button -> {
             this.minecraft.setScreen(new ConfirmLinkScreen((bl) -> {
