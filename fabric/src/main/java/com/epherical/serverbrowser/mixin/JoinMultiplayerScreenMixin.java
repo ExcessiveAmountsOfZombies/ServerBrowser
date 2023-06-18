@@ -11,6 +11,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
@@ -60,7 +61,7 @@ public class JoinMultiplayerScreenMixin extends Screen implements ScreenButtonGr
     }
 
     @Inject(method = "render", at = @At("TAIL"))
-    public void serverBrowser$modifyRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+    public void serverBrowser$modifyRender(GuiGraphics poseStack, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         int yPos = serverBrowser$button.getY();
         int xPos = serverBrowser$button.getX();
 

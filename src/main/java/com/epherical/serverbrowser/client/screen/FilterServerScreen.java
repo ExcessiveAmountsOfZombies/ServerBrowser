@@ -7,7 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -41,7 +41,7 @@ public class FilterServerScreen extends Screen {
     protected void init() {
         queryTags();
         list = new TagList(this, this.minecraft, this.width, this.height, 32, this.height - 64, 25);
-        this.addRenderableWidget(Button.builder(CommonComponents.GUI_CANCEL, (button) -> {
+        this.addRenderableWidget(Button.builder(CommonComponents.GUI_CANCEL, button -> {
             List<Filter> filters = new ArrayList<>();
             for (TagList.Entry child : list.children()) {
                 for (GuiEventListener listener : child.children()) {
@@ -90,14 +90,14 @@ public class FilterServerScreen extends Screen {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
 
-        this.renderBackground(poseStack);
-        this.list.render(poseStack, mouseX, mouseY, partialTick);
-        super.render(poseStack, mouseX, mouseY, partialTick);
+        this.renderBackground(graphics);
+        this.list.render(graphics, mouseX, mouseY, partialTick);
+        super.render(graphics, mouseX, mouseY, partialTick);
 
         if (websiteStatus != null) {
-            drawCenteredString(poseStack, minecraft.font, websiteStatus, width / 2, 40, 0xFFFFFF);
+            graphics.drawCenteredString(minecraft.font, websiteStatus, width / 2, 40, 0xFFFFFF);
         }
     }
 }

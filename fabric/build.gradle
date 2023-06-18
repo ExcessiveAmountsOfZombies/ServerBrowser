@@ -47,10 +47,11 @@ processResources {
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraftVersion}"
-    mappings loom.layered() {
+    mappings loom.officialMojangMappings()
+    /*mappings loom.layered() {
         officialMojangMappings()
-        //parchment("org.parchmentmc.data:parchment-${project.minecraftVersion}:${project.parchmentVersion}")
-    }
+        //parchment("org.parchmentmc.data:parchment-1.18.1:2021.12.19")
+    }*/
 
     modImplementation "net.fabricmc:fabric-loader:${project.fabricLoaderVersion}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabricAPIVersion}"

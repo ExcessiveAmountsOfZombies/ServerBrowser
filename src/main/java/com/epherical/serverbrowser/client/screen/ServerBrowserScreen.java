@@ -8,6 +8,7 @@ import com.epherical.serverbrowser.client.list.ServerBrowserList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
 import net.minecraft.Util;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConnectScreen;
@@ -116,14 +117,14 @@ public class ServerBrowserScreen extends Screen {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    public void render(GuiGraphics poseStack, int mouseX, int mouseY, float partialTick) {
         toolTip = null;
         this.renderBackground(poseStack);
 
         this.list.render(poseStack, mouseX, mouseY, partialTick);
         super.render(poseStack, mouseX, mouseY, partialTick);
         if (this.toolTip != null) {
-            this.renderComponentTooltip(poseStack, this.toolTip, mouseX, mouseY);
+            poseStack.renderComponentTooltip(minecraft.font, this.toolTip, mouseX, mouseY);
         }
         next.active = false;
         prev.active = false;
@@ -137,7 +138,7 @@ public class ServerBrowserScreen extends Screen {
 
 
         if (websiteStatus != null) {
-            drawCenteredString(poseStack, minecraft.font, websiteStatus, width / 2, 40, 0xFFFFFF);
+            poseStack.drawCenteredString(minecraft.font, websiteStatus, width / 2, 40, 0xFFFFFF);
         }
     }
 
@@ -199,7 +200,7 @@ public class ServerBrowserScreen extends Screen {
     }
 
     private void join(ServerData server) {
-        ConnectScreen.startConnecting(this, this.minecraft, ServerAddress.parseString(server.ip), server);
+        ConnectScreen.startConnecting(this, this.minecraft, ServerAddress.parseString(server.ip), server, false);
     }
 
     private void refreshServerList() {

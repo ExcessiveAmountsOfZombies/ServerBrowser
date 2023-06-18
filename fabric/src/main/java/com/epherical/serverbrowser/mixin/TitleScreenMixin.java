@@ -9,6 +9,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -44,7 +45,7 @@ public abstract class TitleScreenMixin extends Screen implements ScreenButtonGra
 
 
     @Inject(method = "render", at = @At("TAIL"))
-    public void serverBrowser$renderOutline(PoseStack poseStack, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+    public void serverBrowser$renderOutline(GuiGraphics poseStack, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         int yPos = serverBrowser$grabbedMultiplayerButton.getY();
         int xPos = serverBrowser$grabbedMultiplayerButton.getX();
 
