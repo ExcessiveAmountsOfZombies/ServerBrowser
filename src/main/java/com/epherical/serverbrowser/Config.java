@@ -2,7 +2,9 @@ package com.epherical.serverbrowser;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonWriter;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -45,7 +47,13 @@ public class Config {
     }
 
     public void saveFile(ConfigSettings settings) throws IOException {
-        Files.writeString(path, GSON.toJson(settings), StandardCharsets.UTF_8, StandardOpenOption.CREATE);
+        try (FileWriter writer = new FileWriter(path.toFile())) {
+            GSON.toJson(settings, writer);
+        }
     }
+
+    /*public void saveFile(ConfigSettings settings) throws IOException {
+        Files.writeString(path, GSON.toJson(settings), StandardCharsets.UTF_8, StandardOpenOption.CREATE);
+    }*/
 
 }
