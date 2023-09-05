@@ -8,5 +8,6 @@ public class ServerBrowserFabric implements ModInitializer {
     @Override
     public void onInitialize() {
 
+
     }
 }
