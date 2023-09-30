@@ -4,7 +4,6 @@ import com.epherical.serverbrowser.client.CommonClient;
 import com.epherical.serverbrowser.client.Filter;
 import com.epherical.serverbrowser.client.screen.FilterServerScreen;
 import com.google.common.collect.Iterables;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Checkbox;

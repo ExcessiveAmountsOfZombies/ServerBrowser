@@ -75,7 +75,7 @@ public class FilterServerScreen extends Screen {
                     JsonObject object = jsonElement.getAsJsonObject();
                     String tagName = object.get("tagName").getAsString();
                     String category = object.get("category").getAsString();
-                    if (CommonClient.getInstance().getSettings().modPackFilter.length() > 0 && category.equals("Modpack")) {
+                    if (!CommonClient.getInstance().getConfig().modPackFilter.isEmpty() && category.equals("Modpack")) {
                         continue;
                     }
                     List<Filter> filterList = new ArrayList<>();

@@ -5,7 +5,6 @@ import com.epherical.serverbrowser.client.CommonClient;
 import com.epherical.serverbrowser.client.Filter;
 import com.epherical.serverbrowser.client.ServerPinger;
 import com.epherical.serverbrowser.client.list.ServerBrowserList;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
@@ -161,7 +160,7 @@ public class ServerBrowserScreen extends Screen {
         });
         main.buildList(main.runQuery(), list, false);
 
-        String packID = CommonClient.getInstance().getSettings().bisectPackID;
+        String packID = CommonClient.getInstance().getConfig().bisectPackID;
         if (packID.length() > 0 && !(page > 1)) {
             // b-ruh
             ServerQuery bisect = new ServerQuery("https://www.bisecthosting.com/api/v1/public_servers", builder -> {

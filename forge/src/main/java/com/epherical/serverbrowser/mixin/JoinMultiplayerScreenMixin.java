@@ -48,7 +48,7 @@ public class JoinMultiplayerScreenMixin extends Screen implements ScreenButtonGr
     public void serverBrowserAddBrowserButton(CallbackInfo ci) {
         serverBrowser$button = this.addRenderableWidget(Button.builder(Component.translatable("Server Browser"), button -> {
             minecraft.setScreen(new ServerBrowserScreen(this));
-            CommonClient.getInstance().getSettings().serverBrowserNotification = false;
+            CommonClient.getInstance().getConfig().serverBrowserNotification = false;
             CommonClient.getInstance().saveConfig();
         }).bounds(3, 3, 120, 20).build());
     }

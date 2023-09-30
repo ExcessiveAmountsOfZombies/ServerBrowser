@@ -108,6 +108,7 @@ dependencies {
 
     compileOnly(fg.deobf("curse.maven:project-${project.forgeFancyMenuID}:${project.forgeFancyMenuFile}"))
     compileOnly(fg.deobf("curse.maven:project-${project.forgeKonkreteID}:${project.forgeKonkreteFile}"))
+    implementation (fg.deobf("com.epherical.epherolib:EpheroLib-forge:${project.epherolibVersion}"))
 
 }
 

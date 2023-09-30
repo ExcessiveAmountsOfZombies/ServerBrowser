@@ -1,7 +1,7 @@
 package com.epherical.serverbrowser.mixin;
 
 import com.epherical.serverbrowser.client.CommonClient;
-import com.epherical.serverbrowser.client.OfficialServer;
+import com.epherical.serverbrowser.config.OfficialServer;
 import com.epherical.serverbrowser.client.OfficialServerListing;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ObjectSelectionList;
@@ -28,7 +28,7 @@ public class ServerSelectionMixin extends ObjectSelectionList {
     @Inject(method = "refreshEntries", at = @At(value = "INVOKE", target = "Ljava/util/List;forEach(Ljava/util/function/Consumer;)V", ordinal = 0))
     public void serverBrowserAddOfficialServers(CallbackInfo ci) {
         OfficialServerListing listing = new OfficialServerListing(screen, minecraft, 0, 0, 0,0 ,0);
-        for (OfficialServer officialServer : CommonClient.getInstance().getSettings().officialServers) {
+        for (OfficialServer officialServer : CommonClient.getInstance().getConfig().officialServers) {
             ServerData serverData = new ServerData(officialServer.getName(), officialServer.getIpAddress(), false);
             this.addEntry(listing.createEntry(screen, serverData));
         }
