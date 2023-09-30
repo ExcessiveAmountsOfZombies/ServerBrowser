@@ -1,5 +1,7 @@
 package com.epherical.serverbrowser.client;
 
+import com.epherical.epherolib.libs.org.spongepowered.configurate.serialize.TypeSerializer;
+
 import java.util.Objects;
 
 public class Filter {

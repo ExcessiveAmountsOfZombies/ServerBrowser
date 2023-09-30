@@ -57,6 +57,7 @@ dependencies {
 
     modCompileOnly("curse.maven:project-${project.fabricFancyMenuID}:${project.fabricFancyMenuFile}")
     modCompileOnly("curse.maven:project-${project.fabricKonkreteID}:${project.fabricKonkreteFile}")
+    modImplementation("com.epherical.epherolib:EpheroLib-fabric:${project.epherolibVersion}")
 
     shade(rootProject)
     compileOnly(rootProject)

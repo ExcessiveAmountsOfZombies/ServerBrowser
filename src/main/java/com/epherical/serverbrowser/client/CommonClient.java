@@ -1,11 +1,11 @@
 package com.epherical.serverbrowser.client;
 
-import com.epherical.serverbrowser.Config;
-import com.epherical.serverbrowser.ConfigSettings;
+import com.epherical.epherolib.libs.org.spongepowered.configurate.hocon.HoconConfigurationLoader;
+import com.epherical.serverbrowser.config.OfficialServer;
+import com.epherical.serverbrowser.config.SBConfig;
 import net.minecraft.client.Minecraft;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,13 +19,16 @@ public class CommonClient {
     private boolean existingSave;
 
     private Set<Filter> filters;
-    private ConfigSettings settings;
-    private Config config;
+    private SBConfig config;
 
-    public CommonClient(Config config) {
+    public CommonClient() {
         client = this;
-        this.config = config;
+        this.config = new SBConfig(HoconConfigurationLoader.builder(), "serverbrowser.conf");
+        this.config.addSerializer(OfficialServer.class, OfficialServer.Serializer.INSTANCE);
+        this.config.loadConfig("serverbrowser");
         filters = new LinkedHashSet<>();
+        this.setSettings();
+
         File file = new File(Minecraft.getInstance().gameDirectory, "saves");
         File[] files = file.listFiles();
         if (files != null) {
@@ -46,10 +49,9 @@ public class CommonClient {
         filters.addAll(filter);
     }
 
-    public void setSettings(ConfigSettings settings) {
-        this.settings = settings;
-        if (settings.modPackFilter.length() > 0)  {
-            filters.add(new Filter(settings.modPackFilter, true));
+    public void setSettings() {
+        if (!config.modPackFilter.isEmpty())  {
+            filters.add(new Filter(config.modPackFilter, true));
         }
     }
 
@@ -66,23 +68,16 @@ public class CommonClient {
     }
 
     public void saveConfig() {
-        try {
-            this.config.saveFile(settings);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.config.saveConfig();
     }
 
-    public Config getConfig() {
+    public SBConfig getConfig() {
         return this.config;
     }
 
-    public ConfigSettings getSettings() {
-        return settings;
-    }
 
     public static boolean displayCircle() {
-        return getInstance().existingSave && getInstance().getSettings().serverBrowserNotification;
+        return getInstance().existingSave && getInstance().config.serverBrowserNotification;
     }
 
 }

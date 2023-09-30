@@ -189,7 +189,7 @@ public class ServerBrowserList extends ObjectSelectionList<ServerBrowserList.Ent
             this.port = object.get("port").getAsInt();
 
             String address = this.ipAddress.toLowerCase(Locale.ROOT);
-            if (CommonClient.getInstance().getSettings().getBlacklistedServers().contains(address)) {
+            if (CommonClient.getInstance().getConfig().blacklistedServers.contains(address)) {
                 this.valid = false;
             }
 
