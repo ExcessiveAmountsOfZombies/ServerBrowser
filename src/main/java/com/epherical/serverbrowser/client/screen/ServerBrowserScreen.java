@@ -5,6 +5,7 @@ import com.epherical.serverbrowser.client.CommonClient;
 import com.epherical.serverbrowser.client.Filter;
 import com.epherical.serverbrowser.client.ServerPinger;
 import com.epherical.serverbrowser.client.list.ServerBrowserList;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
